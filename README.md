@@ -1,5 +1,7 @@
 # ScaleIO
 
+## For a ScaleIO 2.x compatible module, use <https://github.com/cloudscaling/puppet-scaleio>.
+
 #### Table of Contents
 
 1. [Overview](#overview)
