@@ -1,255 +1,170 @@
 # ScaleIO
 
-## For a ScaleIO 2.x compatible module, use <https://github.com/cloudscaling/puppet-scaleio>.
-
-#### Table of Contents
-
-1. [Overview](#overview)
-2. [Module Description](#module-description)
-3. [Setup](#setup)
-    * [What ScaleIO affects](#what-scaleio-affects)
-    * [Setup requirements](#setup-requirements)
-    * [Beginning with scaleio](#beginning-with-scaleio)
-4. [Usage](#usage)
-5. [Reference](#reference)
-5. [Limitations](#limitations)
-6. [Development](#development)
-
 ## Overview
 
-A Puppet module that installs and configures the  ScaleIO block storage service components.  The module currently supports Redhat/CentOS v6.x.  
-
-See <http://github.com/emccode/vagrant-puppet-scaleio> for a simple working example.
+A Puppet module that installs and configures the ScaleIO 2.0 block storage service components.  The module currently supports Ubuntu 14.04.  
 
 ## Module Description
 
 ScaleIO is software that takes local storage from operating systems and configures them in a virtual SAN to deliver block services to operating systems via IP.  The module handles the configuration of ScaleIO components and the creation and mapping of volumes to hosts.
 
-Most aspects of configuration of ScaleIO have been brought into Puppet.  This means an operations team can easily adopt a software storage platform into their existing operations.
+Most aspects of configuration of ScaleIO have been brought into Puppet.
 
 ## Setup
 
 ### What Puppet-ScaleIO affects
 
 * Installs firewall (iptables) settings based on ScaleIO components installed
-* Tested with Puppet 3.7.2+
-	* puppet.conf [main] - parser = “future”
-    * NOTE: This options bugs with foreman.
-* Tested with ScaleIO 1.30-426+, 1.32-401
+* Installs dependency packages such as numactl and libaio1
+* Installs oracle-java8 for gateway
+
+### Tested with
+
+* Puppet 3.7.2+
+* ScaleIO 2.0
+* Ubuntu 14.04
+* Linux kernel 4.2.0-30-generic
 
 ### Setup Requirements
 
-* Requires ScaleIO RPMs available through yum/zypper/platform-specific repository
+* Requires ScaleIO packages available in apt repository (depending on the specific components you want to install)
+  ```
+  emc-scaleio-mdm
+  emc-scaleio-sds
+  emc-scaleio-sdc
+  emc-scaleio-gateway
+  emc_scaleio_gui
+  ```
 
-  EMC-ScaleIO-callhome.x86_64 : scaleio callhome package
-  EMC-ScaleIO-callhome.i386 : scaleio callhome package
-  EMC-ScaleIO-lia.x86_64 : scaleio lia package
-  EMC-ScaleIO-lia.i386 : scaleio lia package
-  EMC-ScaleIO-mdm.x86_64 : scaleio meta-data manager package
-  EMC-ScaleIO-mdm.i386 : scaleio meta-data manager package
-  EMC-ScaleIO-sdc.x86_64 : scaleio sdc package
-  EMC-ScaleIO-sdc.i386 : scaleio sdc package
-  EMC-ScaleIO-sds.x86_64 : scaleio sds package
-  EMC-ScaleIO-sds.i386 : scaleio sds package
-  EMC-ScaleIO-tb.x86_64 : scaleio tb package
-  EMC-ScaleIO-tb.i386 : scaleio tb package
-  EMC-ScaleIO-gateway.noarch : rpm
-  EMC-ScaleIO-gui.noarch : gui-rpm
-
-
-Required modules to install
-
-	puppet module install puppetlabs-stdlib
-	puppet module install puppetlabs-firewall
-	puppet module install puppetlabs-java
-
-
-Optional module to install
-
-	puppet module install dalen-dnsquery
+* Required modules to install
+  ```
+  puppet module install puppetlabs-stdlib
+  puppet module install puppetlabs-firewall
+  ```
 
 ### Beginning with scaleio
+  ```
+  puppet module install cloudscaling-scaleio
+  ```
 
-	puppet module install emccode-scaleio
+## Structure and specifics
 
-## Usage
+All files reside in the root of manifests.
 
-The following section represents variables that are configured at the top of the site.pp file.  They can be considered optional and global as they are reused in the specific class declarations later on.
+They consist of:
 
-In order to make the site.pp more dynamic, we are using the hosts_lookup function to retrieve names for DNS names.  This allows a more dynamic capability for IP addresses.  The FQDN's represented below are not used in the Puppet paramaters, only as lookup references here in the site.pp file.  If lookups are to occur against a DNS server, the dns_lookup function can be used instead of hosts_lookup.  See the puppet <a href="https://github.com/emccode/vagrant-puppet-scaleio">vagrant-puppet-scaleio</a> repo for the most static example of the module.
+* NAME_server.pp files - containing installation of the services named with the "NAME". Should be invoked on the nodes where the service is to be installed.
+* All other .pp files - configure ScaleIO cluster. Should be invoked on either current master MDM or with ``` FACTER_mdm_ips="ip1,ip2,..." ``` set can be invoked from anywhere.
 
-	$version = '1.30-426.0'
-	$mdm_fqdn = ['mdm1.scaleio.local','mdm2.scaleio.local']
-	$mdm_ip = [hosts_lookup($mdm_fqdn[0])[0],hosts_lookup($mdm_fqdn[1])[0]]
-	$tb_fqdn = 'tb.scaleio.local'
-	$tb_ip = hosts_lookup($tb_fqdn)[0]
-	$cluster_name = "cluster1"
-	$enable_cluster_mode = true
-	$password = 'Scaleio123'
-	$gw_password= 'Scaleio123'
+Main parameter for addressing components in cluster is "name". Only SDC is addressed by "ip" for removal.
+All resource declarations are idempotent - they can be repeated as many times as required with the same results. Any optional parameters can be specified later with the same resource declaration.
 
-Here we have the sio_sds_device hash that holds the configuration parameters necessary to specify which device or file on the OS will be conumsed for storage by ScaleIO.
+## Usage example
 
-	$sio_sds_device = {
-	          $tb_fqdn => {
-	            'ip' => hosts_lookup($tb_fqdn)[0],
-	            'protection_domain' => 'protection_domain1',
-	            'devices' => {
-	              '/opt/sio_device1' => {  'size' => '100GB',
-                                         'storage_pool' => 'capacity'
-                                      },
-	            }
-	          },
-	          $mdm_fqdn[0] => {
-	            'ip' => hosts_lookup($mdm_fqdn[0])[0],
-	            'protection_domain' => 'protection_domain1',
-	            'devices' => {
-	              '/opt/sio_device1' => {  'size' => '100GB',
-                                         'storage_pool' => 'capacity'
-                                      },
-	            }
-	          },
-	          $mdm_fqdn[1] => {
-	            'ip' => hosts_lookup($mdm_fqdn[1])[0],
-	            'protection_domain' => 'protection_domain1',
-	            'devices' => {
-	              '/opt/sio_device1' => {  'size' => '100GB',
-                                         'storage_pool' => 'capacity'
-                                      },
-	            }
-	          },
-	        }
+Example of deployment for 3 nodes MDM and 3 nodes SDS cluster is below:
 
-The sio_sdc_volume hash declares volumes that are to be created and the mapping of these volumes to specific clients.
+It's possible to deploy from local directory by the command (replace <my_puppet_dir> with the place where your puppet is):
+  ```
+  puppet apply --modulepath="/<my_puppet_dir>:/etc/puppet/modules" -e "command"
+  ```
+  
+0. You might want to make sure that kernel you have on the nodes for ScaleIO SDC installation (compute and cinder nodes in case of OpenStack deployment) is suitable for the drivers present here: ``` ftp://QNzgdxXix:Aw3wFAwAq3@ftp.emc.com/ ```. Look for something like ``` Ubuntu/2.0.5014.0/4.2.0-30-generic ```. Local kernel version can be found with ``` uname -a ``` command.
 
-	$sio_sdc_volume = {
-	          'volume1' => { 'size_gb' => 8,
-	          'protection_domain' => 'protection_domain1',
-	          'storage_pool' => 'capacity',
-	          'sdc_ip' => [
-	              hosts_lookup($tb_fqdn)[0],
-	              hosts_lookup($mdm_fqdn[0])[0],
-	              hosts_lookup($mdm_fqdn[1])[0],
-	            ]
-	          },
-	        }
+1. Deploy servers. Each puppet should be run on a machine where this service should reside (in any order or in parallel):
 
-The callhome_cfg section is used to configure callhome services for support.
+  Deploy master MDM and create 1-node cluster (can be run without name and ips to just install without cluster creation)
+  ```
+  host1> puppet apply "class { 'scaleio::mdm_server': master_mdm_name=>'master', mdm_ips=>'10.0.0.1' }"
+  ```
+  Deploy secondary MDM (can be rerun with is_manager=>0 to make it TieBreaker)
+  ```
+  host2> puppet apply "class { 'scaleio::mdm_server': }"
+  ```
+  Deploy TieBreaker (can be rerun with is_manager=>1 to make it Manager)
+  ```
+  host3> puppet apply "class { 'scaleio::mdm_server': is_manager=>0 }"
+  ```
 
-	$callhome_cfg = {
-	        'email_to' => "emailto@address.com",
-	        'email_from' => "emailfrom@address.com",
-	        'username' => "monitor_username",
-	        'password' => "monitor_password",
-	        'customer' => "customer_name",
-	        'smtp_host' => "smtp_host",
-	        'smtp_port' => "smtp_port",
-	        'smtp_user' => "smtp_user",
-	        'smtp_password' => "smtp_password",
-	        'severity' => "error",
-	      }
+  Deploy 3 SDS server ()
+  ```
+  host1> puppet apply "class { 'scaleio::sds_server': }"
+  host2> puppet apply "class { 'scaleio::sds_server': }"
+  host3> puppet apply "class { 'scaleio::sds_server': }"
+  ```
 
+2. Configure the cluster (commands can be run from any node).
 
-Following this there are the node classifications.  Here we are provdining the default site.pp classifications that will configure a ScaleIO cluster from scratch using 3 nodes and multiple components per node.
+  Set FACTER_mdm_ips variable
+  ```
+  FACTER_mdm_ips='10.0.0.1,10.0.0.2'
+  ```
 
-Notice that there are extra fields being represented in the node classifications that may not naturally seem like they are required based on the node name.  In the below examples, we are setting up multi-role nodes by specifying multiple components which may require the extra parameters.
+  Login to cluster
+  ```
+  puppet apply "scaleio::login {'login': password=>'password'}"  
+  ```
+  
+  Add standby MDMs
+  ```
+  puppet apply "scaleio::mdm { 'slave': name=>'slave', ips=>'10.0.0.1', role=>'manager' }" 
+  puppet apply "scaleio::mdm { 'tb': name=>'tb', ips=>'10.0.0.2', role=>'tb' }" 
+  ```
+  
+  Create Protection domain with 2 storage pools (fault_sets=>['fs1','fs2','fs3']  can also be specified here)
+  ```
+  puppet apply "scaleio::protection_domain { 'protection domain': 
+	name=>'pd', storage_pools=>['sp1'] }"
+  ```
+  
+  Add 3 SDSs to cluster (Storage pools and device paths in comma-separated lists should go in the same order)
+  ```
+  puppet apply "scaleio::sds { 'sds 1':
+	name=>'sds1', ips=>'10.0.0.1', protection_domain=>'pd', storage_pools=>'sp1', device_paths=>'/dev/sdb' }"
+  puppet apply "scaleio::sds { 'sds 2':
+	name=>'sds2', ips=>'10.0.0.2', protection_domain=>'pd', storage_pools=>'sp1', device_paths=>'/dev/sdb' }"
+  puppet apply "scaleio::sds { 'sds 3':
+	name=>'sds3', ips=>'10.0.0.3', protection_domain=>'pd', storage_pools=>'sp1', device_paths=>'/dev/sdb' }"
+  ```
+  
+3. Deploy clients (in any order or in parallel)
 
-The following is a Tie-Breaker node.
+  Deploy SDC service (should be on the same nodes where volume are mapped to)
+  ```
+  host1> puppet apply "class { 'scaleio::sdc_server': mdm_ips=>'10.0.0.1,10.0.0.2' }"
+  ```
 
-	node /tb/ {
-	  class {'::scaleio':
-	        password => $password,
-	        version => $version,
-	        mdm_ip => $mdm_ip,
-	        tb_ip => $tb_ip,
-	        callhome_cfg => $callhome_cfg,
-	        sio_sds_device => $sio_sds_device,
-	        sds_ssd_env_flag => true,
-	        components => ['tb','sds','sdc','lia'],
-	  }
-	}
+  Deploy Gateway server (password and ips are optional, can be set later with the same command)
+  ```
+  host2> puppet apply "class { 'scaleio::gateway_server': mdm_ips=>'10.0.0.1,10.0.0.2', password=>'password' }"
+  ```
+  
+  Deploy GUI (optional)
+  ```
+  host3> puppet apply "class { 'scaleio::gateway_server': }"    
+  ```
 
-The following is an MDM node.
-
-	node /mdm/ {
-	  class {'::scaleio':
-	        password => $password,
-	        version => $version,
-	        mdm_ip => $mdm_ip,
-	        tb_ip => $tb_ip,
-	        cluster_name => $cluster_name,
-	        sio_sds_device => $sio_sds_device,
-	        sio_sdc_volume => $sio_sdc_volume,
-	        callhome_cfg => $callhome_cfg,
-	        components => ['mdm','sds','sdc','callhome','lia'],
-	  }
-	}
-
-The following is an SDS node.
-
-	node /sds/ {
-	  class {'::scaleio':
-	        password => $password,
-	        version => $version,
-	        mdm_ip => $mdm_ip,
-	        sio_sds_device => $sio_sds_device,
-	        sds_ssd_env_flag => true,
-	        components => ['sds','lia'],
-	  }
-	}
-
-The following is an SDC node.
-
-	node /sdc/ {
-	  class {'::scaleio':
-	        password => $password,
-	        version => $version,
-	        mdm_ip => $mdm_ip,
-	        components => ['sdc', 'lia'],
-	  }
-	}
-
-The following is a Gateway node.
-
-	node /gw/ {
-	  class {'::scaleio':
-	        gw_password => $gw_password,
-	        version => $version,
-	        mdm_ip => $mdm_ip,
-	        components => ['gw'],
-	  }
-	}
-
-
-See <http://github.com/emccode/vagrant-puppet-scaleio> for a working example of a whole site.pp file.
-
+## Performance tuning
+* The manifest scaleio::sds_server sets noop scheduler for all SSD disks.
+* The manifests scaleio::sdc and scaleio::sds apply high_performance profile for SDS and SDC. In order to use regular profile set the parameter performance_profile, e.g.
+  
+  ```
+  puppet apply "scaleio::sds { 'sds 1':
+	name=>'sds1', ips=>'10.0.0.1', protection_domain=>'pd', storage_pools=>'sp1',
+	device_paths=>'/dev/sdb', performance_profile=>'default' }"
+  ```
 
 ## Reference
 
 * puppetlabs-stdlib
 * puppetlabs-firewall
-* puppetlabs-java
-* dalen-dnsquery
 
 ## Limitations
 
-This module currently only support Redhat 6.x and was developed against CentOS 6.5.
+This module currently only support ScaleIO 2.0 and presumes that linux kernel for OS to host the SDC service is suitable for the one in emc-scaleio-sdc package.
+Alternatively after SDC deployment scini driver can be updated on the system according to ScaleIO 2.0 deployment guide.
 
-## Development
+No InstallationManager support is provided. Provisioning of LIA and CallHome is not available.
 
-We encourage the community to actively contribute to this module.
+## Contact information
 
-* Fork the repository
-* Clone
-* Add original repository as upstream
-* Checkout new branch
-* Commit changes
-* Push to your repository
-* Issue pull request
-
-## Contributors
-
-* Eoghan Kelleher
-* Jonas Rosland
-* Clint Kitson
-* Victor da Costa
+- [Project Bug Tracker](https://github.com/emccode/puppet-scaleio/issues)

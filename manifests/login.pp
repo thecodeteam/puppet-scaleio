@@ -1,12 +1,19 @@
-class scaleio::login inherits scaleio {
-  $password                = $scaleio::password
-  $mdm_ip                  = $scaleio::mdm_ip
-  $components              = $scaleio::components
+# Login to ScaleIO cluster
+# requires FACTER ::mdm_ips to be set if not run from master MDM
 
-  if 'mdm' in $components and $mdm_ip[1] in $ip_address_array {
-	  exec { 'Normal Login Class':
-	    command => "scli --mdm_ip ${mdm_ip[0]} --login --username admin --password '${password}'",
-	    path    => '/bin',
-      }
-  } else { notify { 'Not logging in since not MDM': } }
+define scaleio::login(
+  $password,  # string - Password to login into ScaleIO cluster
+)
+{
+  cmd { "${title} login":
+    action      => 'login',
+    ref         => 'password',
+    value       => $password,
+    scope_ref   => 'username',
+    scope_value => 'admin',
+    retry       => 5,
+  }
 }
+
+
+

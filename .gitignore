@@ -1,6 +1,6 @@
-files/*
 pkg/*
 *.tar.gz
 spec/fixtures/modules
 .vagrant
 .project
+.buildpath

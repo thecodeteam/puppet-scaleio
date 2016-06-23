@@ -1,26 +1,54 @@
+# Protection Domain configuration
+# requires FACTER ::mdm_ips to be set if not run from master MDM
 
-class scaleio::protection_domain inherits scaleio {
-  $mdm_ip                  = $scaleio::mdm_ip
-  $components              = $scaleio::components
-  $sio_sds_device          = $scaleio::sio_sds_device
-
-  if $mdm_ip[1] in $ip_address_array and 'mdm' in $components and $scaleio_mdm_state == 'Running' {
-    if($sio_sds_device) {
-      $sio_sds_device.keys.each |$node| {
-        $sds = $sio_sds_device[$node]
-        $protection_domain = $sds['protection_domain']
-
-        exec { "Enable Protection Domain ${protection_domain} for SDS ${node}":
-          command => "scli --add_protection_domain --mdm_ip ${mdm_ip[0]} --protection_domain_name '${protection_domain}'",
-          path    => '/bin',
-          unless  => "scli --query_all --mdm_ip ${mdm_ip[0]} | grep \"^Protection Domain ${protection_domain}\"",
-          require => Class['::scaleio::login']
-        }
-      }
-    } else {
-      notify {  'Protection Domain - sio_sdc_volume not specified': }
+define scaleio::protection_domain (
+  $name,                              # string - Name of protection domain
+  $ensure               = 'present',  # present|absent - Add or remove protection domain
+  $ensure_properties    = 'present',  # present|absent - Add or remove protection domain properties
+  $fault_sets           = undef,      # [string] - Array of fault sets
+  $storage_pools        = undef,      # [string] - Array of storage pools
+  $zero_padding_policy  = undef,      # 'enable'|'disable'
+  )
+{
+  cmd {"Protection domain ${title} ${ensure}":
+    action => $ensure,
+    entity => 'protection_domain',
+    value  => $name,}
+  if $fault_sets {
+    $fs_resources = suffix($fault_sets, ',1')
+    cmd {$fs_resources:
+      action          => $ensure_properties,
+      entity          => 'fault_set',
+      value_in_title  => true,
+      scope_entity    => 'protection_domain',
+      scope_value     => $name,
+      require         => Cmd["Protection domain ${title} ${ensure}"],
     }
-  } else {
-    notify {  'Protection Domain - Not specified as secondary MDM or MDM not running':  }
   }
+  if $storage_pools {
+    $sp_resources = suffix($storage_pools, ',2')
+    cmd {$sp_resources:
+      action          => $ensure_properties,
+      entity          => 'storage_pool',
+      value_in_title  => true,
+      scope_entity    => 'protection_domain',
+      scope_value     => $name,
+      require         => Cmd["Protection domain ${title} ${ensure}"],
+    }
+    if $zero_padding_policy {
+      $sp_zp_resources = suffix($storage_pools, ',3')
+      cmd {$sp_zp_resources:
+        action          => 'modify_zero_padding_policy',
+        ref             => 'storage_pool_name',
+        value_in_title  => true,
+        scope_entity    => 'protection_domain',
+        scope_value     => $name,
+        extra_opts      => "--${zero_padding_policy}_zero_padding",
+        require         => Cmd[$sp_resources],
+      }
+    }
+  }
+
+  # TODO:
+  # set_sds_network_limits
 }
