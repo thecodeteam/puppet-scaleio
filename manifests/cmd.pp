@@ -23,7 +23,7 @@
 #                       paired_hash like for --new_sds_ip_role
 # paired_hash         - Hash of values for arrays of titles
 # extra_opts          - String with any extra options like '--i_am_sure'
-# unless_query        - Explicit unless like "query_sds --sds_name ${name} |
+# unless_query        - Explicit unless like "query_sds --sds_name ${sio_name} |
 #                       grep" without value at the end or implicit for add
 #                       commands
 # onlyif_query        - Explicit onlyif query without value at the end

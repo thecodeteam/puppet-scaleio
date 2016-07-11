@@ -24,12 +24,7 @@ class scaleio::sdc_server (
   if $mdm_ip {
     $ip_array = split($mdm_ip, ',')
     if $ensure == 'present' {
-      exec { "add ip ${ip_array}":
-        command  => "drv_cfg --add_mdm --ip ${ip_array}",
-        path     => '/opt/emc/scaleio/sdc/bin:/bin',
-        require  => Package['emc-scaleio-sdc'],
-        unless   => "drv_cfg --query_mdms | grep ${ip_array}"
-      }
+      scaleio::add_ip { $ip_array: }
     }
     file_line { 'Set MDM IP addresses in drv_cfg.txt':
       ensure  => present,
@@ -43,4 +38,13 @@ class scaleio::sdc_server (
   # TODO:
   # "absent" cleanup
   # Rename mdm_ip to mdm_ips
+}
+
+define scaleio::add_ip {
+  exec { "add ip ${title}":
+    command  => "drv_cfg --add_mdm --ip ${title}",
+    path     => '/opt/emc/scaleio/sdc/bin:/bin',
+    require  => Package['emc-scaleio-sdc'],
+    unless   => "drv_cfg --query_mdms | grep ${title}"
+  }
 }

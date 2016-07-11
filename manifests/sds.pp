@@ -2,7 +2,7 @@
 # requires FACTER ::mdm_ips to be set if not run from master MDM
 
 define scaleio::sds (
-  $name,                                        # string - SDS name
+  $sio_name,                                    # string - SDS name
   $ensure               = 'present',            # present|absent - Add or remove SDS to cluster
   $ensure_properties    = 'present',            # present|absent - Add or remove SDS properties
   $protection_domain    = undef,                # string - Protection domain to specify when adding to cluster
@@ -39,7 +39,7 @@ define scaleio::sds (
     scaleio::cmd {$sds_resource_title:
       action => $ensure,
       entity => 'sds',
-      value  => $name,
+      value  => $sio_name,
     }
   }
   else {
@@ -51,7 +51,7 @@ define scaleio::sds (
     scaleio::cmd {$sds_resource_title:
       action       => $ensure,
       entity       => 'sds',
-      value        => $name,
+      value        => $sio_name,
       scope_entity => 'protection_domain',
       scope_value  => $protection_domain,
       extra_opts   => "--sds_ip ${ips} ${port_opts} ${role_opts} ${storage_pool_opts} ${device_path_opts} ${fault_set_opts}"}
@@ -60,43 +60,43 @@ define scaleio::sds (
       $ip_array = split($ips, ',')
 
       if $ensure_properties == 'present' {
-        $ip_resources = suffix($ip_array, ",${name}1")
+        $ip_resources = suffix($ip_array, ",${sio_name}1")
         scaleio::cmd {$ip_resources:
           action         => 'add_sds_ip',
           ref            => 'new_sds_ip',
           value_in_title => true,
           scope_entity   => 'sds',
-          scope_value    => $name,
+          scope_value    => $sio_name,
           unless_query   => 'query_sds --sds_ip',
-          require        => Cmd[$sds_resource_title] }
+          require        => Scaleio::Cmd[$sds_resource_title] }
 
         if $ip_roles {
           $ips_with_roles = hash(flatten(zip($ip_array, split($ip_roles, ','))))
-          $ip_role_resources = suffix($ip_array, ",${name}2")
+          $ip_role_resources = suffix($ip_array, ",${sio_name}2")
           $role_existence_string = {'all'=>'All', 'sdc_only'=>'SDC Only', 'sds_only'=>'SDS Only'}
           scaleio::cmd {$ip_role_resources:
             action                => 'modify_sds_ip_role',
             ref                   => 'sds_ip_to_modify',
             value_in_title        => true,
             scope_entity          => 'sds',
-            scope_value           => $name,
+            scope_value           => $sio_name,
             paired_ref            => 'new_sds_ip_role',
             paired_hash           => $ips_with_roles,
-            unless_query          => "query_sds --sds_name ${name} | grep",
+            unless_query          => "query_sds --sds_name ${sio_name} | grep",
             unless_query_ext      => ' | grep',
             unless_query_ext_hash => $role_existence_string,
-            require               => Cmd[$sds_resource_title] }
+            require               => Scaleio::Cmd[$sds_resource_title] }
         }
       }
       elsif $ensure_properties == 'absent' {
-        $ip_del_resources = suffix($ip_array, ",${name}3")
+        $ip_del_resources = suffix($ip_array, ",${sio_name}3")
         scaleio::cmd {$ip_del_resources:
           action          => 'remove_sds_ip',
           ref             => 'sds_ip_to_remove',
           value_in_title  => true,
           scope_entity    => 'sds',
-          scope_value     => $name,
-          require         => Cmd[$sds_resource_title] }
+          scope_value     => $sio_name,
+          require         => Scaleio::Cmd[$sds_resource_title] }
       }
     }
 
@@ -113,28 +113,28 @@ define scaleio::sds (
         } else {
           $storage_pools_array = split($storage_pools, ',')
         }
-        $device_resources = suffix($device_array, ",${name}4")
+        $device_resources = suffix($device_array, ",${sio_name}4")
         $devices_with_pools = hash(flatten(zip($device_array, $storage_pools_array)))
         scaleio::cmd {$device_resources:
           action          => 'add_sds_device',
           ref             => 'device_path',
           value_in_title  => true,
           scope_entity    => 'sds',
-          scope_value     => $name,
+          scope_value     => $sio_name,
           paired_ref      => 'storage_pool_name',
           paired_hash     => $devices_with_pools,
-          unless_query    => "query_sds --sds_name ${name} | grep",
-          require         => Cmd[$sds_resource_title] }
+          unless_query    => "query_sds --sds_name ${sio_name} | grep",
+          require         => Scaleio::Cmd[$sds_resource_title] }
       }
       elsif $ensure_properties == 'absent' {
-        $device_del_resources = suffix($device_array, ",${name}5")
+        $device_del_resources = suffix($device_array, ",${sio_name}5")
         scaleio::cmd {$device_del_resources:
           action          => 'remove_sds_device',
           ref             => 'device_path',
           value_in_title  => true,
           scope_entity    => 'sds',
-          scope_value     => $name,
-          require         => Cmd[$sds_resource_title] }
+          scope_value     => $sio_name,
+          require         => Scaleio::Cmd[$sds_resource_title] }
       }
     }
 
@@ -146,13 +146,13 @@ define scaleio::sds (
         $rfcache_action = 'disable'
         $rfcache_device_action = 'remove'
       }
-      $rfcache_devices_resources = suffix(split($rfcache_devices, ','), ",${name}6")
-      $rfcache_resource_name = "sds ${name} rfcache ${rfcache_action}"
+      $rfcache_devices_resources = suffix(split($rfcache_devices, ','), ",${sio_name}6")
+      $rfcache_resource_name = "sds ${sio_name} rfcache ${rfcache_action}"
       scaleio::cmd {$rfcache_resource_name:
         action          => "${rfcache_action}_sds_rfcache",
         scope_entity    => 'sds',
-        scope_value     => $name,
-        require         => Cmd[$sds_resource_title],
+        scope_value     => $sio_name,
+        require         => Scaleio::Cmd[$sds_resource_title],
       }
       if $rfcache_device_action == 'add' {
         scaleio::cmd {$rfcache_devices_resources:
@@ -160,9 +160,9 @@ define scaleio::sds (
           ref             => 'rfcache_device_path',
           value_in_title  => true,
           scope_entity    => 'sds',
-          scope_value     => $name,
-          unless_query    => "query_sds --sds_name ${name} | grep",        
-         require         => Cmd[$rfcache_resource_name],           
+          scope_value     => $sio_name,
+          unless_query    => "query_sds --sds_name ${sio_name} | grep",
+         require         => Scaleio::Cmd[$rfcache_resource_name],
         }
       } else {
         scaleio::cmd {$rfcache_devices_resources:
@@ -170,9 +170,9 @@ define scaleio::sds (
           ref             => 'rfcache_device_path',
           value_in_title  => true,
           scope_entity    => 'sds',
-          scope_value     => $name,
-          onlyif_query    => "query_sds --sds_name ${name} | grep",
-          require         => Cmd[$rfcache_resource_name],
+          scope_value     => $sio_name,
+          onlyif_query    => "query_sds --sds_name ${sio_name} | grep",
+          require         => Scaleio::Cmd[$rfcache_resource_name],
         }
       }
     }
@@ -182,9 +182,9 @@ define scaleio::sds (
       undef   => '',
       default => "--mdm_ip ${::mdm_ips}"}
     exec { "Apply high_performance profile for ${sds_resource_title}":
-      command   => "scli ${mdm_opts} --set_performance_parameters --sds_name ${name} --apply_to_mdm --profile ${performance_profile}",
+      command   => "scli ${mdm_opts} --set_performance_parameters --sds_name ${sio_name} --apply_to_mdm --profile ${performance_profile}",
       path      => '/bin:/usr/bin',
-      require   => Cmd[$sds_resource_title]
+      require   => Scaleio::Cmd[$sds_resource_title]
     }
   }
 
