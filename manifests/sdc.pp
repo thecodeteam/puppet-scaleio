@@ -8,7 +8,7 @@ define scaleio::sdc (
   )
 {
   if $ensure == 'absent' {
-    cmd {"SDC ${ip} ${ensure}":
+    scaleio::cmd {"SDC ${ip} ${ensure}":
       action      => 'remove_sdc',
       ref         => 'sdc_ip',
       value       => $ip,

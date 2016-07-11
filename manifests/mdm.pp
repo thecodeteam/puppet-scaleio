@@ -14,7 +14,7 @@ define scaleio::mdm (
   if $ensure == 'present' {
     $management_ip_opts = $management_ips ? {undef => '', default => "--new_mdm_management_ip ${management_ips}" }
     $port_opts = $port ? {undef => '', default => "--new_mdm_port ${port}" }
-    cmd {"MDM ${title} ${ensure}":
+    scaleio::cmd {"MDM ${title} ${ensure}":
       action       => 'add_standby_mdm',
       ref          => 'new_mdm_name',
       value        => $name,
@@ -25,7 +25,7 @@ define scaleio::mdm (
     }
   }
   elsif $ensure == 'absent' {
-    cmd {"MDM ${title} ${ensure}":
+    scaleio::cmd {"MDM ${title} ${ensure}":
       action        => 'remove_standby_mdm',
       ref           => 'remove_mdm_name',
       value         => $name,
@@ -34,7 +34,7 @@ define scaleio::mdm (
   }
 
   if $management_ips {
-    cmd {"properties ${title} ${ensure_properties}":
+    scaleio::cmd {"properties ${title} ${ensure_properties}":
       action        => 'modify_management_ip',
       ref           => 'target_mdm_name',
       value         => $name,

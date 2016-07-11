@@ -5,7 +5,7 @@ define scaleio::login(
   $password,  # string - Password to login into ScaleIO cluster
 )
 {
-  cmd { "${title} login":
+  scaleio::cmd { "${title} login":
     action      => 'login',
     ref         => 'password',
     value       => $password,

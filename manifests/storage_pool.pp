@@ -19,7 +19,7 @@ define scaleio::storage_pool (
   } else {
     $scaner_mode_opts = undef
   }
-  cmd {"storage pool ${name} ${ensure}":
+  scaleio::cmd {"storage pool ${name} ${ensure}":
     action        => $ensure,
     entity        => 'storage_pool',
     value         => $name,
@@ -75,7 +75,7 @@ define scaleio::set($is_defined, $change = ' ', $pd = undef, $sp = undef, $unles
 {
   if $is_defined {
     $action = split($title, ' ') # action is 4st word in title
-    cmd {$title:
+    scaleio::cmd {$title:
       action        => $action[3],
       ref           => 'storage_pool_name',
       value         => $sp,

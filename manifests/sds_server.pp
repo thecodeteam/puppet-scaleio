@@ -30,7 +30,7 @@ class scaleio::sds_server (
     ensure => $xcache,
   }
   if $xcache == 'present' and $ftp {
-    driver_sync { 'xcache driver sync':
+    scaelio::driver_sync { 'xcache driver sync':
       driver  => 'xcache',
       ftp     => $ftp,
       require => Package['emc-scaleio-xcache'],
