@@ -20,7 +20,7 @@ Most aspects of configuration of ScaleIO have been brought into Puppet.
 
 ### Tested with
 
-* Puppet 3.*
+* Puppet 3.*, 4.*
 * ScaleIO 2.0
 * Ubuntu 14.04
 * Linux kernel 4.2.0-30-generic and 3.13.0-*-generic
