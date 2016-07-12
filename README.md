@@ -99,38 +99,43 @@ It's possible to deploy from local directory by the command (replace <my_puppet_
   FACTER_mdm_ips='10.0.0.1,10.0.0.2'
   ```
 
+  Change default cluster password
+  ```
+  puppet apply "scaleio::login {'login': password=>'admin'} -> scaleio::cluster { 'cluster': password=>'admin', new_password=>'password' }"
+  ```
+
   Login to cluster
   ```
-  puppet apply "scaleio::login {'login': password=>'password'}"  
+  puppet apply "scaleio::login {'login': password=>'password'}"
   ```
-  
+
   Add standby MDMs
   ```
-  puppet apply "scaleio::mdm { 'slave': name=>'slave', ips=>'10.0.0.1', role=>'manager' }" 
-  puppet apply "scaleio::mdm { 'tb': name=>'tb', ips=>'10.0.0.2', role=>'tb' }" 
+  puppet apply "scaleio::mdm { 'slave': sio_name=>'slave', ips=>'10.0.0.1', role=>'manager' }"
+  puppet apply "scaleio::mdm { 'tb': sio_name=>'tb', ips=>'10.0.0.2', role=>'tb' }"
   ```
-  
+
   Create Protection domain with 2 storage pools (fault_sets=>['fs1','fs2','fs3']  can also be specified here)
   ```
-  puppet apply "scaleio::protection_domain { 'protection domain': 
-	name=>'pd', storage_pools=>['sp1'] }"
+  puppet apply "scaleio::protection_domain { 'protection domain':
+	sio_name=>'pd', storage_pools=>['sp1'] }"
   ```
   
   Add 3 SDSs to cluster (Storage pools and device paths in comma-separated lists should go in the same order)
   ```
   puppet apply "scaleio::sds { 'sds 1':
-	name=>'sds1', ips=>'10.0.0.1', protection_domain=>'pd', storage_pools=>'sp1', device_paths=>'/dev/sdb' }"
+	sio_name=>'sds1', ips=>'10.0.0.1', ip_roles=>'all', protection_domain=>'pd', storage_pools=>'sp1', device_paths=>'/dev/sdb' }"
   puppet apply "scaleio::sds { 'sds 2':
-	name=>'sds2', ips=>'10.0.0.2', protection_domain=>'pd', storage_pools=>'sp1', device_paths=>'/dev/sdb' }"
+	sio_name=>'sds2', ips=>'10.0.0.2', ip_roles=>'all', protection_domain=>'pd', storage_pools=>'sp1', device_paths=>'/dev/sdb' }"
   puppet apply "scaleio::sds { 'sds 3':
-	name=>'sds3', ips=>'10.0.0.3', protection_domain=>'pd', storage_pools=>'sp1', device_paths=>'/dev/sdb' }"
+	sio_name=>'sds3', ips=>'10.0.0.3', ip_roles=>'all', protection_domain=>'pd', storage_pools=>'sp1', device_paths=>'/dev/sdb' }"
   ```
   
 3. Deploy clients (in any order or in parallel)
 
   Deploy SDC service (should be on the same nodes where volume are mapped to)
   ```
-  host1> puppet apply "class { 'scaleio::sdc_server': mdm_ips=>'10.0.0.1,10.0.0.2' }"
+  host1> puppet apply "class { 'scaleio::sdc_server': mdm_ip=>'10.0.0.1,10.0.0.2' }"
   ```
 
   Deploy Gateway server (password and ips are optional, can be set later with the same command)
@@ -140,7 +145,7 @@ It's possible to deploy from local directory by the command (replace <my_puppet_
   
   Deploy GUI (optional)
   ```
-  host3> puppet apply "class { 'scaleio::gateway_server': }"    
+  host3> puppet apply "class { 'scaleio::gui_server': }"
   ```
 
 ## Performance tuning
@@ -149,7 +154,7 @@ It's possible to deploy from local directory by the command (replace <my_puppet_
   
   ```
   puppet apply "scaleio::sds { 'sds 1':
-	name=>'sds1', ips=>'10.0.0.1', protection_domain=>'pd', storage_pools=>'sp1',
+	sio_name=>'sds1', ips=>'10.0.0.1', protection_domain=>'pd', storage_pools=>'sp1',
 	device_paths=>'/dev/sdb', performance_profile=>'default' }"
   ```
 
