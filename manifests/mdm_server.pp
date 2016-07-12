@@ -28,7 +28,10 @@ class scaleio::mdm_server (
       proto   => tcp,
       action  => accept,
     }
-    scaleio::common_server { 'install common packages for MDM': is_mdm=>1 } ->
+    scaleio::common_server { 'install common packages for MDM': } ->
+    package { ['mutt', 'python', 'python-paramiko']:
+      ensure => installed,
+    } ->
     package { [$mdm_package]:
       ensure => $ensure,
     }

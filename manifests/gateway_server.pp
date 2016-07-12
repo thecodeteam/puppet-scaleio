@@ -19,8 +19,7 @@ class scaleio::gateway_server (
 
   if $ensure == 'absent' {
     package { $gw_package:
-      ensure    => 'purged',
-      provider  => dpkg,
+      ensure => absent,
     }
   }
   else {
@@ -29,7 +28,7 @@ class scaleio::gateway_server (
       proto  => tcp,
       action => accept,
     }
-    scaleio::common_server { 'install common packages for gateway': java=>1 } ->
+    scaleio::common_server { 'install common packages for gateway': ensure_java=>'present' } ->
     package { $gw_package:
         ensure  => installed,
     } ->

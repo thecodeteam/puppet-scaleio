@@ -11,12 +11,11 @@ class scaleio::gui_server (
 
   if $ensure == 'absent' {
     package { $gui_package:
-      ensure    => absent,
-      provider  => dpkg,
+      ensure => absent,
     }
   }
   else {
-    scaleio::common_server { 'install common packages for GUI': java=>1 } ->
+    scaleio::common_server { 'install common packages for GUI': ensure_java=>'present' } ->
     package { $gui_package:
       ensure  => installed,
     }
