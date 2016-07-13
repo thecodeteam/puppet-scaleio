@@ -6,10 +6,13 @@ class scaleio::sdc_server (
   $ftp     = 'default'                                # string - 'default' or FTP with user and password
   )
 {
-  package { ['numactl', 'libaio1']:
-    ensure => installed,
-  } ->
-  package { ['emc-scaleio-sdc']:
+  $sdc_package = $::osfamily ? {
+    'RedHat' => 'EMC-ScaleIO-sdc',
+    'Debian' => 'emc-scaleio-sdc',
+  }
+
+  scaleio::common_server { 'install common packages for SDC': } ->
+  package { [$sdc_package]:
     ensure => $ensure,
   }
 
@@ -17,21 +20,23 @@ class scaleio::sdc_server (
     scaleio::driver_sync { 'scini driver sync':
       driver  => 'scini',
       ftp     => $ftp,
-      require => Package['emc-scaleio-sdc'],
+      require => Package[$sdc_package],
     }
   }
 
   if $mdm_ip {
     $ip_array = split($mdm_ip, ',')
     if $ensure == 'present' {
-      scaleio::add_ip { $ip_array: }
+      scaleio::add_ip { $ip_array:
+        require => Package[$sdc_package],
+      }
     }
     file_line { 'Set MDM IP addresses in drv_cfg.txt':
       ensure  => present,
       line    => "mdm ${mdm_ip}",
       path    => '/bin/emc/scaleio/drv_cfg.txt',
       match   => '^mdm .*',
-      require => Package['emc-scaleio-sdc'],
+      require => Package[$sdc_package],
     }
   }
 
@@ -44,7 +49,6 @@ define scaleio::add_ip {
   exec { "add ip ${title}":
     command  => "drv_cfg --add_mdm --ip ${title}",
     path     => '/opt/emc/scaleio/sdc/bin:/bin',
-    require  => Package['emc-scaleio-sdc'],
     unless   => "drv_cfg --query_mdms | grep ${title}"
   }
 }

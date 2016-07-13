@@ -6,15 +6,22 @@ class scaleio::sds_server (
   $ftp    = 'default',  # string - 'default' or FTP with user and password
   )
 {
+  $sds_package = $::osfamily ? {
+    'RedHat' => 'EMC-ScaleIO-sds',
+    'Debian' => 'emc-scaleio-sds',
+  }
+  $xcache_package = $::osfamily ? {
+    'RedHat' => 'EMC-ScaleIO-xcache',
+    'Debian' => 'emc-scaleio-xcache',
+  }
+
   firewall { '001 Open Port 7072 for ScaleIO SDS':
     dport  => [7072],
     proto  => tcp,
     action => accept,
   }
-  package { ['numactl', 'libaio1']:
-    ensure => installed,
-  } ->
-  package { ['emc-scaleio-sds']:
+  scaleio::common_server { 'install common packages for SDS': } ->
+  package { [$sds_package]:
     ensure => $ensure,
   } ->
   exec { 'Apply noop IO scheduler for SSD/flash disks':
@@ -26,14 +33,14 @@ class scaleio::sds_server (
     path    => '/etc/udev/rules.d/60-scaleio-ssd-scheduler.rules',
   } ->
 
-  package { ['emc-scaleio-xcache']:
+  package { [$xcache_package]:
     ensure => $xcache,
   }
   if $xcache == 'present' and $ftp {
     scaleio::driver_sync { 'xcache driver sync':
       driver  => 'xcache',
       ftp     => $ftp,
-      require => Package['emc-scaleio-xcache'],
+      require => Package[$xcache_package],
     }
   }
 

@@ -8,8 +8,17 @@ class scaleio::mdm_server (
   $mdm_management_ips       = undef,      # string - MDM management IPs
   )
 {
+  $mdm_package = $::osfamily ? {
+    'RedHat' => 'EMC-ScaleIO-mdm',
+    'Debian' => 'emc-scaleio-mdm',
+  }
+  $provider = $::osfamily ? {
+    'RedHat' => 'upstart',
+    default  => undef,
+  }
+
   if $ensure == 'absent' {
-    package { ['emc-scaleio-mdm']:
+    package { [$mdm_package]:
       ensure => 'absent',
     }
   }
@@ -19,17 +28,19 @@ class scaleio::mdm_server (
       proto   => tcp,
       action  => accept,
     }
-    package { ['numactl', 'libaio1', 'mutt', 'python', 'python-paramiko']:
+    scaleio::common_server { 'install common packages for MDM': } ->
+    package { ['mutt', 'python', 'python-paramiko']:
       ensure => installed,
     } ->
-    package { ['emc-scaleio-mdm']:
+    package { [$mdm_package]:
       ensure => $ensure,
     }
     service { ['mdm']:
       ensure    => 'running',
       enable    => true,
       hasstatus => true,
-      require   => Package['emc-scaleio-mdm'],
+      require   => Package[$mdm_package],
+      provider  => $provider
     }
 
     if $is_manager != undef {
@@ -37,7 +48,7 @@ class scaleio::mdm_server (
         path    => '/opt/emc/scaleio/mdm/cfg/conf.txt',
         line    => "actor_role_is_manager=${is_manager}",
         match   => '^actor_role_is_manager',
-        require => Package['emc-scaleio-mdm'],
+        require => Package[$mdm_package],
         notify  => Service['mdm'],
         before  => [Exec['create_cluster']],
       }
