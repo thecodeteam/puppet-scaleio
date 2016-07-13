@@ -12,8 +12,8 @@ class scaleio::gateway_server (
     'RedHat' => 'EMC-ScaleIO-gateway',
     'Debian' => 'emc-scaleio-gateway',
   }
-  $provider = $::osfamily ? {
-    'RedHat' => 'upstart',
+  $provider = "${::osfamily}${::operatingsystemmajrelease}" ? {
+    'RedHat6' => 'upstart',
     default  => undef,
   }
 

@@ -12,8 +12,8 @@ class scaleio::mdm_server (
     'RedHat' => 'EMC-ScaleIO-mdm',
     'Debian' => 'emc-scaleio-mdm',
   }
-  $provider = $::osfamily ? {
-    'RedHat' => 'upstart',
+  $provider = "${::osfamily}${::operatingsystemmajrelease}" ? {
+    'RedHat6' => 'upstart',
     default  => undef,
   }
 
@@ -35,7 +35,7 @@ class scaleio::mdm_server (
     package { [$mdm_package]:
       ensure => $ensure,
     }
-    service { ['mdm']:
+    service { 'mdm':
       ensure    => 'running',
       enable    => true,
       hasstatus => true,
