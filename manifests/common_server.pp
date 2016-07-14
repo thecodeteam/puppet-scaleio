@@ -17,7 +17,7 @@ define scaleio::common_server (
       ensure => installed,
     }
     if $ensure_java == 'present' {
-      # Exec { path => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/' ] } ->
+      Exec { path => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/' ] } ->
       # Below are a java 1.8 installation steps which shouldn't be required for newer Ubuntu versions
       exec { 'add java8 repo':
         command => 'add-apt-repository ppa:webupd8team/java && apt-get update',
