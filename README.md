@@ -118,19 +118,24 @@ It's possible to deploy from local directory by the command (replace <my_puppet_
   Create Protection domain with 2 storage pools (fault_sets=>['fs1','fs2','fs3']  can also be specified here)
   ```
   puppet apply "scaleio::protection_domain { 'protection domain':
-	sio_name=>'pd', storage_pools=>['sp1'] }"
+    sio_name=>'pd', storage_pools=>['sp1'] }"
   ```
-  
+
   Add 3 SDSs to cluster (Storage pools and device paths in comma-separated lists should go in the same order)
   ```
   puppet apply "scaleio::sds { 'sds 1':
-	sio_name=>'sds1', ips=>'10.0.0.1', ip_roles=>'all', protection_domain=>'pd', storage_pools=>'sp1', device_paths=>'/dev/sdb' }"
+    sio_name=>'sds1', ips=>'10.0.0.1', ip_roles=>'all', protection_domain=>'pd', storage_pools=>'sp1', device_paths=>'/dev/sdb' }"
   puppet apply "scaleio::sds { 'sds 2':
-	sio_name=>'sds2', ips=>'10.0.0.2', ip_roles=>'all', protection_domain=>'pd', storage_pools=>'sp1', device_paths=>'/dev/sdb' }"
+    sio_name=>'sds2', ips=>'10.0.0.2', ip_roles=>'all', protection_domain=>'pd', storage_pools=>'sp1', device_paths=>'/dev/sdb' }"
   puppet apply "scaleio::sds { 'sds 3':
-	sio_name=>'sds3', ips=>'10.0.0.3', ip_roles=>'all', protection_domain=>'pd', storage_pools=>'sp1', device_paths=>'/dev/sdb' }"
+    sio_name=>'sds3', ips=>'10.0.0.3', ip_roles=>'all', protection_domain=>'pd', storage_pools=>'sp1', device_paths=>'/dev/sdb' }"
   ```
-  
+
+  Set password for user 'scaleio_client'
+  ```
+  puppet apply "scaleio::cluster { 'cluster': client_password=>'Client_Password' }"
+  ```
+
 3. Deploy clients (in any order or in parallel)
 
   Deploy SDC service (should be on the same nodes where volume are mapped to)
@@ -142,7 +147,7 @@ It's possible to deploy from local directory by the command (replace <my_puppet_
   ```
   host2> puppet apply "class { 'scaleio::gateway_server': mdm_ips=>'10.0.0.1,10.0.0.2', password=>'password' }"
   ```
-  
+
   Deploy GUI (optional)
   ```
   host3> puppet apply "class { 'scaleio::gui_server': }"
@@ -151,11 +156,11 @@ It's possible to deploy from local directory by the command (replace <my_puppet_
 ## Performance tuning
 * The manifest scaleio::sds_server sets noop scheduler for all SSD disks.
 * The manifests scaleio::sdc and scaleio::sds apply high_performance profile for SDS and SDC. In order to use regular profile set the parameter performance_profile, e.g.
-  
+
   ```
   puppet apply "scaleio::sds { 'sds 1':
-	sio_name=>'sds1', ips=>'10.0.0.1', protection_domain=>'pd', storage_pools=>'sp1',
-	device_paths=>'/dev/sdb', performance_profile=>'default' }"
+    sio_name=>'sds1', ips=>'10.0.0.1', protection_domain=>'pd', storage_pools=>'sp1',
+    device_paths=>'/dev/sdb', performance_profile=>'default' }"
   ```
 
 ## Reference

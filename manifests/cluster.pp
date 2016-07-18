@@ -14,6 +14,7 @@ define scaleio::cluster (
   $performance_profile                = undef,      # string - Performance profile for SDC: default or high_performance
   $capacity_high_alert_threshold      = undef,      # number - Percent of consumed storage space for high priority alert, should be used toghether with capacity_critical_alert_threshold
   $capacity_critical_alert_threshold  = undef,      # number - Percent of consumed storage space for critical priority alert, should be used toghether with capacity_high_alert_threshold
+  $client_password                    = undef,      # string - The password for the user created for ScaleIO clients with role FontEndConfigure
   )
 {
   if $cluster_mode {
@@ -87,4 +88,21 @@ define scaleio::cluster (
   # TODO:
   # Users, Volumes, Certificates, Caches
   # Password can be changed only with current password - can be done by resetting with only new password
+
+  # this block must be last block. it can change current login.
+  if $client_password {
+    $user = 'scaleio_client'
+    file { "/root/create_client_user.sh":
+      ensure => $ensure,
+      source => "puppet:///modules/scaleio/create_client_user.sh",
+      mode  => '0700',
+      owner => 'root',
+      group => 'root',
+    } ->
+    exec { 'create_client_user':
+      unless  => "scli --query_user --username ${user}",
+      command => "/root/create_client_user.sh ${user} ${client_password}",
+      path    => '/bin:/usr/bin',
+    }
+  }
 }
