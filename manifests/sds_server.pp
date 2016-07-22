@@ -36,7 +36,7 @@ class scaleio::sds_server (
   package { [$xcache_package]:
     ensure => $xcache,
   }
-  if $xcache == 'present' and $ftp {
+  if $xcache == 'present' and $ftp and $ftp != '' {
     scaleio::driver_sync { 'xcache driver sync':
       driver  => 'xcache',
       ftp     => $ftp,

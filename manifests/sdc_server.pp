@@ -1,9 +1,9 @@
 # Configure ScaleIO SDC service installation
 
 class scaleio::sdc_server (
-  $ensure  = 'present',                               # present|absent - Install or remove SDC service
-  $mdm_ip  = undef,                                   # string - List of MDM IPs
-  $ftp     = 'default'                                # string - 'default' or FTP with user and password
+  $ensure  = 'present',  # present|absent - Install or remove SDC service
+  $mdm_ip  = undef,      # string - List of MDM IPs
+  $ftp     = 'default'   # string - 'default' or FTP with user and password
   )
 {
   $sdc_package = $::osfamily ? {
@@ -16,7 +16,7 @@ class scaleio::sdc_server (
     ensure => $ensure,
   }
 
-  if $ensure == 'present' and $ftp {
+  if $ensure == 'present' and $ftp and $ftp != '' {
     scaleio::driver_sync { 'scini driver sync':
       driver  => 'scini',
       ftp     => $ftp,
@@ -24,7 +24,7 @@ class scaleio::sdc_server (
     }
   }
 
-  if $mdm_ip {
+  if $mdm_ip != undef and $mdm_ip != '' {
     $ip_array = split($mdm_ip, ',')
     if $ensure == 'present' {
       scaleio::add_ip { $ip_array:
@@ -37,6 +37,16 @@ class scaleio::sdc_server (
       path    => '/bin/emc/scaleio/drv_cfg.txt',
       match   => '^mdm .*',
       require => Package[$sdc_package],
+    }
+  } else {
+    file_line { 'Reset MDM IP addresses in drv_cfg.txt':
+      ensure  => absent,
+      line    => undef,
+      path    => '/bin/emc/scaleio/drv_cfg.txt',
+      match   => '^mdm .*',
+      match_for_absence => true,
+      require => Package[$sdc_package],
+      replace => false,
     }
   }
 
