@@ -17,40 +17,40 @@ class scaleio::sdc_server (
     ensure => $ensure,
   }
 
-  if $ensure == 'present' and $ftp and $ftp != '' {
-    scaleio::driver_sync { 'scini driver sync':
-      driver  => 'scini',
-      ftp     => $ftp,
-      require => Package[$sdc_package],
-    }
-  }
+  if $ensure == 'present' {
+    service { 'scini': }
 
-  if $mdm_ip != undef and $mdm_ip != '' {
-    if $ensure_properties == 'present' {
-      $ip_array = split($mdm_ip, ',')
-      if $ensure == 'present' {
-        scaleio::add_ip { $ip_array:
+    if $ftp and $ftp != '' {
+      scaleio::driver_sync { 'scini driver sync':
+        driver  => 'scini',
+        ftp     => $ftp,
+        require => Package[$sdc_package],
+      }
+    }
+
+    if $mdm_ip != undef and $mdm_ip != '' {
+      if $ensure_properties == 'present' {
+        file_line { 'Set MDM IP addresses in drv_cfg.txt':
+          ensure  => present,
+          line    => "mdm ${mdm_ip}",
+          path    => '/bin/emc/scaleio/drv_cfg.txt',
+          match   => '^mdm .*',
           require => Package[$sdc_package],
+          notify  => Service['scini']
         }
       }
-      file_line { 'Set MDM IP addresses in drv_cfg.txt':
-        ensure  => present,
-        line    => "mdm ${mdm_ip}",
-        path    => '/bin/emc/scaleio/drv_cfg.txt',
-        match   => '^mdm .*',
-        require => Package[$sdc_package],
-      }
-    }
-  } else {
-    if $ensure_properties == 'absent' {
-      file_line { 'Reset MDM IP addresses in drv_cfg.txt':
-        ensure  => absent,
-        line    => '',
-        path    => '/bin/emc/scaleio/drv_cfg.txt',
-        match   => '^mdm .*',
-        match_for_absence => true,
-        require => Package[$sdc_package],
-        replace => false,
+    } else {
+      if $ensure_properties == 'absent' {
+        file_line { 'Reset MDM IP addresses in drv_cfg.txt':
+          ensure  => absent,
+          line    => '',
+          path    => '/bin/emc/scaleio/drv_cfg.txt',
+          match   => '^mdm .*',
+          match_for_absence => true,
+          require => Package[$sdc_package],
+          replace => false,
+          notify  => Service['scini']
+        }
       }
     }
   }
@@ -58,12 +58,4 @@ class scaleio::sdc_server (
   # TODO:
   # "absent" cleanup
   # Rename mdm_ip to mdm_ips
-}
-
-define scaleio::add_ip {
-  exec { "add ip ${title}":
-    command  => "drv_cfg --add_mdm --ip ${title}",
-    path     => '/opt/emc/scaleio/sdc/bin:/bin',
-    unless   => "drv_cfg --query_mdms | grep ${title}"
-  }
 }
