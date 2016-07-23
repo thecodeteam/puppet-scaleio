@@ -18,7 +18,9 @@ class scaleio::sdc_server (
   }
 
   if $ensure == 'present' {
-    service { 'scini': }
+    service { 'scini':
+      ensure => 'running',
+    }
 
     if $ftp and $ftp != '' {
       scaleio::driver_sync { 'scini driver sync':
