@@ -58,7 +58,7 @@ define scaleio::driver_sync(
     command => 'update_driver_cache.sh && verify_driver.sh',
     unless  => ["test ! -f /bin/emc/scaleio/${driver}_sync/verify_driver.sh", 'verify_driver.sh'],
     path    => ["/bin/emc/scaleio/${driver}_sync/", '/bin/', '/usr/bin', '/sbin'],
-    notify  => Service['${driver}'],
+    notify  => Service["${driver}"],
   }
 }
 
