@@ -3,7 +3,7 @@
 class scaleio::sdc_server (
   $ensure               = 'present',  # present|absent - Install or remove SDC service
   $mdm_ip               = undef,      # string - List of MDM IPs
-  $ftp                  = 'default'   # string - 'default' or FTP with user and password
+  $ftp                  = 'default',  # string - 'default' or FTP with user and password
   $ensure_properties    = 'present',  # present|absent - Add or remove SDS properties
   )
 {
