@@ -21,7 +21,8 @@ define scaleio::sds (
   $device_paths_count = $device_paths   ? { false => 0, default => count(split($device_paths, ',')) }
   if $pools_count > 1 {
     if $pools_count != $device_paths_count {
-      fail("Number of storage pools should be either 1 or equal to number of storage devices: pools_count=${pools_count}, device_paths_count=${device_paths_count}")
+      $log_vars = "pools_count=${pools_count}, device_paths_count=${device_paths_count}"
+      fail("Number of storage pools should be either 1 or equal to number of storage devices: ${log_vars}")
     }
   } else {
       if ($pools_count != 0 and $device_paths_count == 0) or ($pools_count == 0 and $device_paths_count != 0) {

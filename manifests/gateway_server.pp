@@ -68,8 +68,10 @@ class scaleio::gateway_server (
       }
     }
     if $password {
+      $jar_path = '/opt/emc/scaleio/gateway/webapps/ROOT'
+      $opts = "--reset_password '${password}' --config_file ${jar_path}/WEB-INF/classes/gatewayUser.properties"
       exec { 'Set gateway admin password':
-        command     => "java -jar /opt/emc/scaleio/gateway/webapps/ROOT/resources/install-CLI.jar --reset_password '${password}' --config_file /opt/emc/scaleio/gateway/webapps/ROOT/WEB-INF/classes/gatewayUser.properties",
+        command     => "java -jar ${jar_path}/resources/install-CLI.jar ${opts}",
         path        => '/etc/alternatives',
         refreshonly => true,
         notify      => Service['scaleio-gateway']

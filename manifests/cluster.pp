@@ -12,9 +12,12 @@ define scaleio::cluster (
   $new_password                       = undef,      # string - New password
   $license_file_path                  = undef,      # string - Path to license file
   $performance_profile                = undef,      # string - Performance profile for SDC: default or high_performance
-  $capacity_high_alert_threshold      = undef,      # number - Percent of consumed storage space for high priority alert, should be used toghether with capacity_critical_alert_threshold
-  $capacity_critical_alert_threshold  = undef,      # number - Percent of consumed storage space for critical priority alert, should be used toghether with capacity_high_alert_threshold
-  $client_password                    = undef,      # string - The password for the user created for ScaleIO clients with role FontEndConfigure
+  $capacity_high_alert_threshold      = undef,      # number - Percent of consumed storage space for high priority alert,
+                                                    #          should be used toghether with capacity_critical_alert_threshold
+  $capacity_critical_alert_threshold  = undef,      # number - Percent of consumed storage space for critical priority alert,
+                                                    #          should be used toghether with capacity_high_alert_threshold
+  $client_password                    = undef,      # string - The password for the user created for ScaleIO clients
+                                                    #          with role FontEndConfigure
   )
 {
   if $cluster_mode {
@@ -79,8 +82,10 @@ define scaleio::cluster (
       $mdm_opts = $::mdm_ips ? {
         undef   => '',
         default => "--mdm_ip ${::mdm_ips}"}
+      $opt_h = "--capacity_high_threshold ${capacity_high_alert_threshold}"
+      $opt_c = "--capacity_critical_threshold ${capacity_critical_alert_threshold}"
       exec { 'Set capacity allert thresholds':
-        command => "scli ${mdm_opts} --set_capacity_alerts_threshold --capacity_high_threshold ${capacity_high_alert_threshold} --capacity_critical_threshold ${capacity_critical_alert_threshold} --all_storage_pools --system_default",
+        command => "scli ${mdm_opts} --set_capacity_alerts_threshold ${opt_h} ${opt_c} --all_storage_pools --system_default",
         path    => '/bin:/usr/bin',
       }
   }

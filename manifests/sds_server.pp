@@ -14,18 +14,20 @@ class scaleio::sds_server (
     'RedHat' => 'EMC-ScaleIO-xcache',
     'Debian' => 'emc-scaleio-xcache',
   }
-
   firewall { '001 Open Port 7072 for ScaleIO SDS':
     dport  => [7072],
     proto  => tcp,
     action => accept,
   }
+  $noop_devs = '`lsblk -d -o ROTA,KNAME | awk "/^ *0/ {print($2)}"`'
+  $noop_set_cmd = 'if [ -f /sys/block/$i/queue/scheduler ]; then echo noop > /sys/block/$i/queue/scheduler; fi'
+
   scaleio::common_server { 'install common packages for SDS': } ->
   package { [$sds_package]:
     ensure => $ensure,
   } ->
   exec { 'Apply noop IO scheduler for SSD/flash disks':
-    command => 'bash -c \'for i in `lsblk -d -o ROTA,KNAME | awk "/^ *0/ {print($2)}"` ; do if [ -f /sys/block/$i/queue/scheduler ]; then echo noop > /sys/block/$i/queue/scheduler; fi; done\'',
+    command => "bash -c 'for i in ${noop_devs} ; do ${noop_set_cmd} ; done'",
     path    => '/bin:/usr/bin',
   } ->
   file { 'Ensure noop IO scheduler persistent':

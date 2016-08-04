@@ -19,13 +19,14 @@ define scaleio::storage_pool (
   } else {
     $scaner_mode_opts = undef
   }
+  $query_pool_opts = "--protection_domain_name ${protection_domain} --storage_pool_name ${sio_name}"
   scaleio::cmd {"storage pool ${sio_name} ${ensure}":
     action       => $ensure,
     entity       => 'storage_pool',
     value        => $sio_name,
     scope_entity => 'protection_domain',
-    scope_value  => $protection_domain} ->
-
+    scope_value  => $protection_domain
+  } ->
   scaleio::set { "storage pool ${sio_name} set_checksum_mode":
     is_defined => $checksum_mode,
     change     => "--${checksum_mode}_checksum",
@@ -37,7 +38,7 @@ define scaleio::storage_pool (
     change       => "--${zero_padding_policy}_zero_padding",
     pd           => $protection_domain,
     sp           => $sio_name,
-    unless_query => "query_storage_pool --protection_domain_name ${protection_domain} --storage_pool_name ${sio_name} | grep -B 1000 'Zero padding is ${zero_padding_policy}' | grep -q ",
+    unless_query => "query_storage_pool ${query_pool_opts} | grep -B 1000 'Zero padding is ${zero_padding_policy}' | grep -q ",
   } ->
   scaleio::set { "storage pool ${sio_name} set_rmcache_write_handling_mode":
     is_defined => $rmcache_write_handling_mode,

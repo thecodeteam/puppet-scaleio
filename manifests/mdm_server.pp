@@ -56,6 +56,7 @@ class scaleio::mdm_server (
 
     # Cluster creation is here
     $opts = '--approve_certificate --accept_license --create_mdm_cluster --use_nonsecure_communication'
+    $master_opts = "--master_mdm_name ${master_mdm_name} --master_mdm_ip ${mdm_ips}"
     $management_ip_opts = $mdm_management_ips ? {
       undef   => '',
       default => "--master_mdm_management_ip ${mdm_management_ips}"
@@ -64,7 +65,7 @@ class scaleio::mdm_server (
       onlyif    => "test -n '${master_mdm_name}'",
       require   => Service['mdm'],
       # Sleep is needed here because service in role changing can be still alive and not restarted
-      command   => "sleep 2 ; scli --query_cluster --approve_certificate || scli ${opts} --master_mdm_name ${master_mdm_name} --master_mdm_ip ${mdm_ips} ${management_ip_opts}",
+      command   => "sleep 2 ; scli --query_cluster --approve_certificate || scli ${opts} ${master_opts} ${management_ip_opts}",
       path      => '/bin:/usr/bin',
       tries     => 5,
       try_sleep => 5,
