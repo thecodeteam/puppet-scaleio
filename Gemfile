@@ -1,5 +1,7 @@
 source ENV['GEM_SOURCE'] || "https://rubygems.org"
 
+gem 'json_pure', '<2.0.2'
+
 group :development, :test do
   gem 'puppetlabs_spec_helper',               :require => 'false'
   gem 'rspec-puppet', '~> 2.2.0',             :require => 'false'
