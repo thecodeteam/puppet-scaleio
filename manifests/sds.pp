@@ -162,7 +162,7 @@ define scaleio::sds (
           scope_entity   => 'sds',
           scope_value    => $sio_name,
           unless_query   => "query_sds --sds_name ${sio_name} | grep",
-         require         => Scaleio::Cmd[$rfcache_resource_name],
+          require        => Scaleio::Cmd[$rfcache_resource_name],
         }
       } else {
         scaleio::cmd {$rfcache_devices_resources:

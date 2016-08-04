@@ -76,7 +76,7 @@ class scaleio::gateway_server (
       }
     }
 
-    File_line <| |> ~> Service['scaleio-gateway']
+    File_line<| |> ~> Service['scaleio-gateway']
   }
 
   # TODO:
