@@ -21,11 +21,11 @@ define scaleio::cluster (
     # Cluster mode changed
     $action = $ensure ? {'absent' => 'remove', default => 'add'}
     scaleio::cmd {"switch cluster mode ${ensure}":
-      action        => 'switch_cluster_mode',
-      ref           => 'cluster_mode',
-      value         => "${cluster_mode}_node",
-      extra_opts    => "--${action}_slave_mdm_name ${slave_names} --${action}_tb_name ${tb_names} --i_am_sure",
-      unless_query  => 'query_cluster | grep -A 1 "Cluster:" | grep'
+      action       => 'switch_cluster_mode',
+      ref          => 'cluster_mode',
+      value        => "${cluster_mode}_node",
+      extra_opts   => "--${action}_slave_mdm_name ${slave_names} --${action}_tb_name ${tb_names} --i_am_sure",
+      unless_query => 'query_cluster | grep -A 1 "Cluster:" | grep'
     }
   }
   if $slave_names_to_replace or $tb_names_to_replace {
@@ -46,8 +46,8 @@ define scaleio::cluster (
       default     => "--remove_tb_name ${tb_names_to_replace}"
     }
     scaleio::cmd {"replace cluster nodes ${add_slave_opts} ${remove_slave_opts} ${add_tb_opts} ${remove_tb_opts}":
-      action        => 'replace_cluster_mdm',
-      extra_opts    => "${add_slave_opts} ${remove_slave_opts} ${add_tb_opts} ${remove_tb_opts} --allow_leave_failed --i_am_sure",
+      action     => 'replace_cluster_mdm',
+      extra_opts => "${add_slave_opts} ${remove_slave_opts} ${add_tb_opts} ${remove_tb_opts} --allow_leave_failed --i_am_sure",
     }
   }
   if $new_password {
@@ -70,18 +70,18 @@ define scaleio::cluster (
     $mdm_opts = $::mdm_ips ? {
       undef   => '',
       default => "--mdm_ip ${::mdm_ips}"}
-    exec { "Apply high_performance profile for all":
-      command   => "scli ${mdm_opts} --set_performance_parameters --all_sdc --all_sds --apply_to_mdm --profile ${performance_profile}",
-      path      => '/bin:/usr/bin',
+    exec { 'Apply high_performance profile for all':
+      command => "scli ${mdm_opts} --set_performance_parameters --all_sdc --all_sds --apply_to_mdm --profile ${performance_profile}",
+      path    => '/bin:/usr/bin',
     }
   }
   if $capacity_high_alert_threshold and $capacity_critical_alert_threshold {
       $mdm_opts = $::mdm_ips ? {
         undef   => '',
         default => "--mdm_ip ${::mdm_ips}"}
-      exec { "Set capacity allert thresholds":
-        command   => "scli ${mdm_opts} --set_capacity_alerts_threshold --capacity_high_threshold ${capacity_high_alert_threshold} --capacity_critical_threshold ${capacity_critical_alert_threshold} --all_storage_pools --system_default",
-        path      => '/bin:/usr/bin',
+      exec { 'Set capacity allert thresholds':
+        command => "scli ${mdm_opts} --set_capacity_alerts_threshold --capacity_high_threshold ${capacity_high_alert_threshold} --capacity_critical_threshold ${capacity_critical_alert_threshold} --all_storage_pools --system_default",
+        path    => '/bin:/usr/bin',
       }
   }
 
@@ -92,12 +92,12 @@ define scaleio::cluster (
   # this block must be last block. it can change current login.
   if $client_password {
     $user = 'scaleio_client'
-    file { "/root/create_client_user.sh":
+    file { '/root/create_client_user.sh':
       ensure => $ensure,
-      source => "puppet:///modules/scaleio/create_client_user.sh",
-      mode  => '0700',
-      owner => 'root',
-      group => 'root',
+      source => 'puppet:///modules/scaleio/create_client_user.sh',
+      mode   => '0700',
+      owner  => 'root',
+      group  => 'root',
     } ->
     exec { 'create_client_user':
       unless  => "scli --query_user --username ${user}",

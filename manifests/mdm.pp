@@ -26,21 +26,21 @@ define scaleio::mdm (
   }
   elsif $ensure == 'absent' {
     scaleio::cmd {"MDM ${title} ${ensure}":
-      action        => 'remove_standby_mdm',
-      ref           => 'remove_mdm_name',
-      value         => $sio_name,
-      onlyif_query  => 'query_cluster | grep'
+      action       => 'remove_standby_mdm',
+      ref          => 'remove_mdm_name',
+      value        => $sio_name,
+      onlyif_query => 'query_cluster | grep'
     }
   }
 
   if $management_ips {
     scaleio::cmd {"properties ${title} ${ensure_properties}":
-      action        => 'modify_management_ip',
-      ref           => 'target_mdm_name',
-      value         => $sio_name,
-      extra_opts    => "--new_mdm_management_ip ${management_ips}",
-      unless_query  => "query_cluster | grep -B 1 \"Management IPs: ${management_ips}\" | grep",
-      require       => Scaleio::Cmd["MDM ${title} ${ensure}"]
+      action       => 'modify_management_ip',
+      ref          => 'target_mdm_name',
+      value        => $sio_name,
+      extra_opts   => "--new_mdm_management_ip ${management_ips}",
+      unless_query => "query_cluster | grep -B 1 \"Management IPs: ${management_ips}\" | grep",
+      require      => Scaleio::Cmd["MDM ${title} ${ensure}"]
     }
   }
 

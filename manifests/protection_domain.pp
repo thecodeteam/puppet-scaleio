@@ -17,34 +17,34 @@ define scaleio::protection_domain (
   if $fault_sets {
     $fs_resources = suffix($fault_sets, ',1')
     scaleio::cmd {$fs_resources:
-      action          => $ensure_properties,
-      entity          => 'fault_set',
-      value_in_title  => true,
-      scope_entity    => 'protection_domain',
-      scope_value     => $sio_name,
-      require         => Scaleio::Cmd["Protection domain ${title} ${ensure}"],
+      action         => $ensure_properties,
+      entity         => 'fault_set',
+      value_in_title => true,
+      scope_entity   => 'protection_domain',
+      scope_value    => $sio_name,
+      require        => Scaleio::Cmd["Protection domain ${title} ${ensure}"],
     }
   }
   if $storage_pools {
     $sp_resources = suffix($storage_pools, ',2')
     scaleio::cmd {$sp_resources:
-      action          => $ensure_properties,
-      entity          => 'storage_pool',
-      value_in_title  => true,
-      scope_entity    => 'protection_domain',
-      scope_value     => $sio_name,
-      require         => Scaleio::Cmd["Protection domain ${title} ${ensure}"],
+      action         => $ensure_properties,
+      entity         => 'storage_pool',
+      value_in_title => true,
+      scope_entity   => 'protection_domain',
+      scope_value    => $sio_name,
+      require        => Scaleio::Cmd["Protection domain ${title} ${ensure}"],
     }
     if $zero_padding_policy {
       $sp_zp_resources = suffix($storage_pools, ',3')
       scaleio::cmd {$sp_zp_resources:
-        action          => 'modify_zero_padding_policy',
-        ref             => 'storage_pool_name',
-        value_in_title  => true,
-        scope_entity    => 'protection_domain',
-        scope_value     => $sio_name,
-        extra_opts      => "--${zero_padding_policy}_zero_padding",
-        require         => Scaleio::Cmd[$sp_resources],
+        action         => 'modify_zero_padding_policy',
+        ref            => 'storage_pool_name',
+        value_in_title => true,
+        scope_entity   => 'protection_domain',
+        scope_value    => $sio_name,
+        extra_opts     => "--${zero_padding_policy}_zero_padding",
+        require        => Scaleio::Cmd[$sp_resources],
       }
     }
   }

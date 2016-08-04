@@ -20,17 +20,17 @@ define scaleio::storage_pool (
     $scaner_mode_opts = undef
   }
   scaleio::cmd {"storage pool ${sio_name} ${ensure}":
-    action        => $ensure,
-    entity        => 'storage_pool',
-    value         => $sio_name,
-    scope_entity  => 'protection_domain',
-    scope_value   => $protection_domain} ->
+    action       => $ensure,
+    entity       => 'storage_pool',
+    value        => $sio_name,
+    scope_entity => 'protection_domain',
+    scope_value  => $protection_domain} ->
 
   scaleio::set { "storage pool ${sio_name} set_checksum_mode":
-    is_defined  => $checksum_mode,
-    change      => "--${checksum_mode}_checksum",
-    pd          => $protection_domain,
-    sp          => $sio_name,
+    is_defined => $checksum_mode,
+    change     => "--${checksum_mode}_checksum",
+    pd         => $protection_domain,
+    sp         => $sio_name,
   } ->
   scaleio::set { "storage pool ${sio_name} modify_zero_padding_policy":
     is_defined   => $zero_padding_policy,
@@ -46,16 +46,16 @@ define scaleio::storage_pool (
     sp         => $sio_name,
   } ->
   scaleio::set { "storage pool ${sio_name} set_rmcache_usage":
-    is_defined  => $rmcache_usage,
-    change      => "--${rmcache_usage}_rmcache --i_am_sure",
-    pd          => $protection_domain,
-    sp          => $sio_name
+    is_defined => $rmcache_usage,
+    change     => "--${rmcache_usage}_rmcache --i_am_sure",
+    pd         => $protection_domain,
+    sp         => $sio_name
   } ->
   scaleio::set { "storage pool ${sio_name} set_rfcache_usage":
-    is_defined  => $rfcache_usage,
-    change      => "--${rfcache_usage}_rfcache --i_am_sure",
-    pd          => $protection_domain,
-    sp          => $sio_name
+    is_defined => $rfcache_usage,
+    change     => "--${rfcache_usage}_rfcache --i_am_sure",
+    pd         => $protection_domain,
+    sp         => $sio_name
   } ->
   scaleio::set { "storage pool ${sio_name} modify_spare_policy":
     is_defined => $spare_percentage,
@@ -76,13 +76,13 @@ define scaleio::set($is_defined, $change = ' ', $pd = undef, $sp = undef, $unles
   if $is_defined {
     $action = split($title, ' ') # action is 4st word in title
     scaleio::cmd {$title:
-      action        => $action[3],
-      ref           => 'storage_pool_name',
-      value         => $sp,
-      scope_entity  => 'protection_domain',
-      scope_value   => $pd,
-      extra_opts    => $change,
-      unless_query  => $unless_query,
+      action       => $action[3],
+      ref          => 'storage_pool_name',
+      value        => $sp,
+      scope_entity => 'protection_domain',
+      scope_value  => $pd,
+      extra_opts   => $change,
+      unless_query => $unless_query,
     }
   }
 }

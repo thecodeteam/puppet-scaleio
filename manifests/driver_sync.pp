@@ -29,10 +29,10 @@ define scaleio::driver_sync(
   }
   $sync_keys = keys($sync_conf)
 
-  file { "Ensure sync directory present: ":
-    ensure  => directory,
-    path    => "/bin/emc/scaleio/${driver}_sync",
-    mode    => '0755',
+  file { 'Ensure sync directory present: ':
+    ensure => directory,
+    path   => "/bin/emc/scaleio/${driver}_sync",
+    mode   => '0755',
   } ->
   file { "/bin/emc/scaleio/${driver}_sync/RPM-GPG-KEY-ScaleIO":
     ensure => present,
@@ -46,9 +46,9 @@ define scaleio::driver_sync(
     path    => ['/bin/', '/usr/bin', '/sbin'],
     onlyif  => "echo '${ftp_proto}' | grep -q sftp",
   } ->
-  file { "Ensure sync config present: ":
-    ensure  => file,
-    path    => "/bin/emc/scaleio/${driver}_sync/driver_sync.conf",
+  file { 'Ensure sync config present: ':
+    ensure => file,
+    path   => "/bin/emc/scaleio/${driver}_sync/driver_sync.conf",
   } ->
   config_sync { $sync_keys:
     driver => $driver,
@@ -58,16 +58,16 @@ define scaleio::driver_sync(
     command => 'update_driver_cache.sh && verify_driver.sh',
     unless  => ["test ! -f /bin/emc/scaleio/${driver}_sync/verify_driver.sh", 'verify_driver.sh'],
     path    => ["/bin/emc/scaleio/${driver}_sync/", '/bin/', '/usr/bin', '/sbin'],
-    notify  => Service["${driver}"],
+    notify  => Service[$driver],
   }
 }
 
 define config_sync($driver, $config) {
   file_line { "config_sync ${title}":
-    ensure  => present,
-    path    => "/bin/emc/scaleio/${driver}_sync/driver_sync.conf",
-    match   => "^${title}",
-    line    => "${title}=${config[$title]}",
+    ensure => present,
+    path   => "/bin/emc/scaleio/${driver}_sync/driver_sync.conf",
+    match  => "^${title}",
+    line   => "${title}=${config[$title]}",
   }
 }
 

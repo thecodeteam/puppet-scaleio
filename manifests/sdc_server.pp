@@ -44,14 +44,14 @@ class scaleio::sdc_server (
     } else {
       if $ensure_properties == 'absent' {
         file_line { 'Reset MDM IP addresses in drv_cfg.txt':
-          ensure  => absent,
-          line    => '',
-          path    => '/bin/emc/scaleio/drv_cfg.txt',
-          match   => '^mdm .*',
+          ensure            => absent,
+          line              => '',
+          path              => '/bin/emc/scaleio/drv_cfg.txt',
+          match             => '^mdm .*',
           match_for_absence => true,
-          require => Package[$sdc_package],
-          replace => false,
-          notify  => Service['scini']
+          require           => Package[$sdc_package],
+          replace           => false,
+          notify            => Service['scini']
         }
       }
     }

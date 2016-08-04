@@ -24,9 +24,9 @@ class scaleio::mdm_server (
   }
   else {
     firewall { '001 Open Ports 6611 and 9011 for ScaleIO MDM':
-      dport   => [6611, 9011],
-      proto   => tcp,
-      action  => accept,
+      dport  => [6611, 9011],
+      proto  => tcp,
+      action => accept,
     }
     scaleio::common_server { 'install common packages for MDM': } ->
     package { ['mutt', 'python', 'python-paramiko']:

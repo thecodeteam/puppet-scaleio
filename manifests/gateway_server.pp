@@ -46,16 +46,16 @@ class scaleio::gateway_server (
       require => Package[$gw_package],
     } ->
     file_line { 'Set gateway port':
-      ensure  => present,
-      line    => "ssl.port=${port}",
-      path    => '/opt/emc/scaleio/gateway/conf/catalina.properties',
-      match   => '^ssl.port=',
+      ensure => present,
+      line   => "ssl.port=${port}",
+      path   => '/opt/emc/scaleio/gateway/conf/catalina.properties',
+      match  => '^ssl.port=',
     } ->
     file_line { 'Set IM web-app port':
-      ensure  => present,
-      line    => "http.port=${im_port}",
-      path    => '/opt/emc/scaleio/gateway/conf/catalina.properties',
-      match   => '^http.port=',
+      ensure => present,
+      line   => "http.port=${im_port}",
+      path   => '/opt/emc/scaleio/gateway/conf/catalina.properties',
+      match  => '^http.port=',
     }
     if $mdm_ips {
       $mdm_ips_str = join(split($mdm_ips,','), ';')

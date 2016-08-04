@@ -9,18 +9,18 @@ define scaleio::sdc (
 {
   if $ensure == 'absent' {
     scaleio::cmd {"SDC ${ip} ${ensure}":
-      action      => 'remove_sdc',
-      ref         => 'sdc_ip',
-      value       => $ip,
-      extra_opts  => '--i_am_sure'}
+      action     => 'remove_sdc',
+      ref        => 'sdc_ip',
+      value      => $ip,
+      extra_opts => '--i_am_sure'}
   } else {
     #Apply profile high_performance
     $mdm_opts = $::mdm_ips ? {
       undef   => '',
       default => "--mdm_ip ${::mdm_ips}"}
     exec { "Apply high_performance profile for SDC ${ip}":
-      command   => "scli ${mdm_opts} --set_performance_parameters --all_sdc --apply_to_mdm --profile ${performance_profile}",
-      path      => '/bin:/usr/bin',
+      command => "scli ${mdm_opts} --set_performance_parameters --all_sdc --apply_to_mdm --profile ${performance_profile}",
+      path    => '/bin:/usr/bin',
     }
   }
 }
