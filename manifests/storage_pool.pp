@@ -20,51 +20,52 @@ define scaleio::storage_pool (
     $scaner_mode_opts = undef
   }
   $query_pool_opts = "--protection_domain_name ${protection_domain} --storage_pool_name ${sio_name}"
-  scaleio::cmd {"storage pool ${sio_name} ${ensure}":
+  $sp_full_name = "${protection_domain}:${sio_name}"
+  scaleio::cmd {"storage pool ${sp_full_name} ${ensure}":
     action       => $ensure,
     entity       => 'storage_pool',
     value        => $sio_name,
     scope_entity => 'protection_domain',
     scope_value  => $protection_domain
   } ->
-  scaleio::set { "storage pool ${sio_name} set_checksum_mode":
+  scaleio::set { "storage pool ${sp_full_name} set_checksum_mode":
     is_defined => $checksum_mode,
     change     => "--${checksum_mode}_checksum",
     pd         => $protection_domain,
     sp         => $sio_name,
   } ->
-  scaleio::set { "storage pool ${sio_name} modify_zero_padding_policy":
+  scaleio::set { "storage pool ${sp_full_name} modify_zero_padding_policy":
     is_defined   => $zero_padding_policy,
     change       => "--${zero_padding_policy}_zero_padding",
     pd           => $protection_domain,
     sp           => $sio_name,
     unless_query => "query_storage_pool ${query_pool_opts} | grep -B 1000 'Zero padding is ${zero_padding_policy}' | grep -q ",
   } ->
-  scaleio::set { "storage pool ${sio_name} set_rmcache_write_handling_mode":
+  scaleio::set { "storage pool ${sp_full_name} set_rmcache_write_handling_mode":
     is_defined => $rmcache_write_handling_mode,
     change     => "--rmcache_write_handling_mode ${rmcache_write_handling_mode} --i_am_sure",
     pd         => $protection_domain,
     sp         => $sio_name,
   } ->
-  scaleio::set { "storage pool ${sio_name} set_rmcache_usage":
+  scaleio::set { "storage pool ${sp_full_name} set_rmcache_usage":
     is_defined => $rmcache_usage,
     change     => "--${rmcache_usage}_rmcache --i_am_sure",
     pd         => $protection_domain,
     sp         => $sio_name
   } ->
-  scaleio::set { "storage pool ${sio_name} set_rfcache_usage":
+  scaleio::set { "storage pool ${sp_full_name} set_rfcache_usage":
     is_defined => $rfcache_usage,
     change     => "--${rfcache_usage}_rfcache --i_am_sure",
     pd         => $protection_domain,
     sp         => $sio_name
   } ->
-  scaleio::set { "storage pool ${sio_name} modify_spare_policy":
+  scaleio::set { "storage pool ${sp_full_name} modify_spare_policy":
     is_defined => $spare_percentage,
     change     => "--spare_percentage ${spare_percentage} --i_am_sure",
     pd         => $protection_domain,
     sp         => $sio_name,
   } ->
-  scaleio::set { "storage pool ${sio_name} ${scanner_mode}_background_device_scanner":
+  scaleio::set { "storage pool ${sp_full_name} ${scanner_mode}_background_device_scanner":
     is_defined => $scanner_mode,
     change     => $scaner_mode_opts,
     pd         => $protection_domain,

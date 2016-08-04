@@ -4,3 +4,5 @@ spec/fixtures/modules
 .vagrant
 .project
 .buildpath
+.bundle/*
+Gemfile.lock
