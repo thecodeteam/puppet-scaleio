@@ -4,7 +4,7 @@ describe 'scaleio::sds' do
 
   let (:title) { 'title' }
   let :default_params do {
-    :name => 'name',
+    :sio_name => 'name',
     :ensure => 'present',
     :ensure_properties => 'present',  # present|absent - Add or remove SDS properties
     :protection_domain  => 'domain',

@@ -5,7 +5,7 @@ describe 'scaleio::mdm' do
   let (:title) { 'title' }
   let :default_params do
   {
-    :name => 'name',
+    :sio_name => 'name',
     :ensure => 'present',
     :ensure_properties      => 'present',
     :role                   => 'manager'

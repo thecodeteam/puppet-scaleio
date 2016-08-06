@@ -4,11 +4,11 @@ describe 'scaleio::storage_pool' do
 
   let (:title) { 'title' }
   let :default_params do {
-    :name => 'name',
+    :sio_name => 'name',
     :ensure => 'present',  # present|absent - Add or remove storage pool
     :protection_domain => 'domain',
     :scanner_mode => '',  # 'device_only'|'data_comparison'|'disable'
-    :scanner_bandwidth_limit => '25',}
+  }
   end
   let (:params) { default_params }
   it { is_expected.to contain_scaleio__storage_pool(title) }
