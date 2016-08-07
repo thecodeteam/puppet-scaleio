@@ -1,6 +1,6 @@
 pkg/*
 *.tar.gz
-spec/fixtures/modules
+spec/fixtures
 .vagrant
 .project
 .buildpath

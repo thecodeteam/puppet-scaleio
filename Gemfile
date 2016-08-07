@@ -4,9 +4,9 @@ gem 'json', '<2.0.0'
 gem 'json_pure', '<2.0.2'
 
 group :development, :test, :system_tests do
-  gem 'puppetlabs_spec_helper', :require => false
-  gem 'rspec-puppet',           :require => false
-  gem 'rspec-puppet-facts',     :require => false
+  gem 'puppet-openstack_spec_helper',
+      :git     => 'https://git.openstack.org/openstack/puppet-openstack_spec_helper',
+      :require => false
 end
 
 if facterversion = ENV['FACTER_GEM_VERSION']
