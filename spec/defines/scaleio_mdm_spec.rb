@@ -12,7 +12,7 @@ describe 'scaleio::mdm' do
   }
   end
   let (:params) { default_params }
-  it { is_expected.to contain_scaleio__mdm(title).with_name('name') }
+  it { is_expected.to contain_scaleio__mdm(title).with_sio_name('name') }
 
   context 'when ensure is present' do
     let :params do
@@ -30,14 +30,14 @@ describe 'scaleio::mdm' do
         :value => 'name',
         :scope_ref => 'mdm_role',
         :scope_value => 'manager',
-        :extra_opts => '--new_mdm_ip   ',
+        :extra_opts => '--new_mdm_ip  --new_mdm_port  --new_mdm_management_ip  --force_clean --i_am_sure',
         :unless_query => 'query_cluster | grep')}
-      it { is_expected.to contain_exec('scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip   ').with(
-        :command => 'scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip   ',
-        :path => '/bin/',
-        :unless => 'scli  --approve_certificate  --query_cluster | grep name')}
-      it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip   ')}
-      it { is_expected.to contain_notify('SCLI UNLESS: scli  --approve_certificate  --query_cluster | grep name')}
+      it { is_expected.to contain_exec('scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip  --new_mdm_port  --new_mdm_management_ip  --force_clean --i_am_sure').with(
+        :command => 'scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip  --new_mdm_port  --new_mdm_management_ip  --force_clean --i_am_sure',
+        :path => ['/bin/'],
+        :unless => 'scli  --approve_certificate --query_cluster | grep name ')}
+      it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip  --new_mdm_port  --new_mdm_management_ip  --force_clean --i_am_sure')}
+      it { is_expected.to contain_notify('SCLI UNLESS: scli  --approve_certificate --query_cluster | grep name ')}
     end
     context 'without management_ips && with port' do
       let :params do
@@ -51,14 +51,14 @@ describe 'scaleio::mdm' do
         :value => 'name',
         :scope_ref => 'mdm_role',
         :scope_value => 'manager',
-        :extra_opts => '--new_mdm_ip  --new_mdm_port 4332 ',
+        :extra_opts => '--new_mdm_ip  --new_mdm_port 4332 --new_mdm_management_ip  --force_clean --i_am_sure',
         :unless_query => 'query_cluster | grep')}
-      it { is_expected.to contain_exec('scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip  --new_mdm_port 4332 ').with(
-        :command => 'scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip  --new_mdm_port 4332 ',
-        :path => '/bin/',
-        :unless => 'scli  --approve_certificate  --query_cluster | grep name')}
-      it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip  --new_mdm_port 4332 ')}
-      it { is_expected.to contain_notify('SCLI UNLESS: scli  --approve_certificate  --query_cluster | grep name')}
+      it { is_expected.to contain_exec('scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip  --new_mdm_port 4332 --new_mdm_management_ip  --force_clean --i_am_sure').with(
+        :command => 'scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip  --new_mdm_port 4332 --new_mdm_management_ip  --force_clean --i_am_sure',
+        :path => ['/bin/'],
+        :unless => 'scli  --approve_certificate --query_cluster | grep name ')}
+      it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip  --new_mdm_port 4332 --new_mdm_management_ip  --force_clean --i_am_sure')}
+      it { is_expected.to contain_notify('SCLI UNLESS: scli  --approve_certificate --query_cluster | grep name ')}
     end
     context 'with management_ips && without port' do
       let :params do
@@ -72,14 +72,14 @@ describe 'scaleio::mdm' do
         :value => 'name',
         :scope_ref => 'mdm_role',
         :scope_value => 'manager',
-        :extra_opts => '--new_mdm_ip   --new_mdm_management_ip 1.2.3.4,1.2.3.5',
+        :extra_opts => '--new_mdm_ip  --new_mdm_port  --new_mdm_management_ip 1.2.3.4,1.2.3.5 --force_clean --i_am_sure',
         :unless_query => 'query_cluster | grep')}
-      it { is_expected.to contain_exec('scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip   --new_mdm_management_ip 1.2.3.4,1.2.3.5').with(
-        :command => 'scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip   --new_mdm_management_ip 1.2.3.4,1.2.3.5',
-        :path => '/bin/',
-        :unless => 'scli  --approve_certificate  --query_cluster | grep name')}
-      it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip   --new_mdm_management_ip 1.2.3.4,1.2.3.5')}
-      it { is_expected.to contain_notify('SCLI UNLESS: scli  --approve_certificate  --query_cluster | grep name')}
+      it { is_expected.to contain_exec('scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip  --new_mdm_port  --new_mdm_management_ip 1.2.3.4,1.2.3.5 --force_clean --i_am_sure').with(
+        :command => 'scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip  --new_mdm_port  --new_mdm_management_ip 1.2.3.4,1.2.3.5 --force_clean --i_am_sure',
+        :path => ['/bin/'],
+        :unless => 'scli  --approve_certificate --query_cluster | grep name ')}
+      it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip  --new_mdm_port  --new_mdm_management_ip 1.2.3.4,1.2.3.5 --force_clean --i_am_sure')}
+      it { is_expected.to contain_notify('SCLI UNLESS: scli  --approve_certificate --query_cluster | grep name ')}
     end
     context 'with management_ips && with port' do
       let :params do
@@ -93,14 +93,14 @@ describe 'scaleio::mdm' do
         :value => 'name',
         :scope_ref => 'mdm_role',
         :scope_value => 'manager',
-        :extra_opts => '--new_mdm_ip  --new_mdm_port 4332 --new_mdm_management_ip 1.2.3.4,1.2.3.5',
+        :extra_opts => '--new_mdm_ip  --new_mdm_port 4332 --new_mdm_management_ip 1.2.3.4,1.2.3.5 --force_clean --i_am_sure',
         :unless_query => 'query_cluster | grep')}
-      it { is_expected.to contain_exec('scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip  --new_mdm_port 4332 --new_mdm_management_ip 1.2.3.4,1.2.3.5').with(
-        :command => 'scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip  --new_mdm_port 4332 --new_mdm_management_ip 1.2.3.4,1.2.3.5',
-        :path => '/bin/',
-        :unless => 'scli  --approve_certificate  --query_cluster | grep name')}
-      it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip  --new_mdm_port 4332 --new_mdm_management_ip 1.2.3.4,1.2.3.5')}
-      it { is_expected.to contain_notify('SCLI UNLESS: scli  --approve_certificate  --query_cluster | grep name')}
+      it { is_expected.to contain_exec('scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip  --new_mdm_port 4332 --new_mdm_management_ip 1.2.3.4,1.2.3.5 --force_clean --i_am_sure').with(
+        :command => 'scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip  --new_mdm_port 4332 --new_mdm_management_ip 1.2.3.4,1.2.3.5 --force_clean --i_am_sure',
+        :path => ['/bin/'],
+        :unless => 'scli  --approve_certificate --query_cluster | grep name ')}
+      it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --add_standby_mdm --new_mdm_name name --mdm_role manager  --new_mdm_ip  --new_mdm_port 4332 --new_mdm_management_ip 1.2.3.4,1.2.3.5 --force_clean --i_am_sure')}
+      it { is_expected.to contain_notify('SCLI UNLESS: scli  --approve_certificate --query_cluster | grep name ')}
     end
   end
   context 'when ensure is absent' do
@@ -113,7 +113,7 @@ describe 'scaleio::mdm' do
       :value => 'name',)}
     it { is_expected.to contain_exec('scli  --approve_certificate --remove_standby_mdm --remove_mdm_name name   ').with(
       :command => 'scli  --approve_certificate --remove_standby_mdm --remove_mdm_name name   ',
-      :path => '/bin/',)}
+      :path => ['/bin/'],)}
     it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --remove_standby_mdm --remove_mdm_name name   ')}
   end
 
@@ -131,7 +131,7 @@ describe 'scaleio::mdm' do
     end
     it { is_expected.to contain_exec('scli  --approve_certificate --modify_management_ip --target_mdm_name name   --new_mdm_management_ip 1.2.3.4,1.2.3.5').with(
       :command => 'scli  --approve_certificate --modify_management_ip --target_mdm_name name   --new_mdm_management_ip 1.2.3.4,1.2.3.5',
-      :path => '/bin/',)}
+      :path => ['/bin/'],)}
     it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --modify_management_ip --target_mdm_name name   --new_mdm_management_ip 1.2.3.4,1.2.3.5')}
   end
 end

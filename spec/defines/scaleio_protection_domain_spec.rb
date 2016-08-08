@@ -10,7 +10,7 @@ describe 'scaleio::protection_domain' do
   }
   end
   let (:params) { default_params }
-  it { is_expected.to contain_scaleio__protection_domain(title).with_name('name') }
+  it { is_expected.to contain_scaleio__protection_domain(title).with_sio_name('name') }
 
   it 'contains protection domain' do
     is_expected.to contain_scaleio__cmd('Protection domain title present').with(
@@ -21,7 +21,7 @@ describe 'scaleio::protection_domain' do
   it do
     is_expected.to contain_exec('scli  --approve_certificate --add_protection_domain --protection_domain_name name   ').with(
       :command => 'scli  --approve_certificate --add_protection_domain --protection_domain_name name   ',
-      :path => '/bin/',
+      :path => ['/bin/'],
       :unless => 'scli  --approve_certificate  --query_protection_domain --protection_domain_name name ')
   end
   it do
@@ -53,11 +53,11 @@ describe 'scaleio::protection_domain' do
     it do
       is_expected.to contain_exec('scli  --approve_certificate --add_fault_set --fault_set_name a --protection_domain_name name  ').with(
         :command => 'scli  --approve_certificate --add_fault_set --fault_set_name a --protection_domain_name name  ',
-        :path => '/bin/',
+        :path => ['/bin/'],
         :unless => 'scli  --approve_certificate  --query_fault_set --fault_set_name a --protection_domain_name name')
       is_expected.to contain_exec('scli  --approve_certificate --add_fault_set --fault_set_name b --protection_domain_name name  ').with(
         :command => 'scli  --approve_certificate --add_fault_set --fault_set_name b --protection_domain_name name  ',
-        :path => '/bin/',
+        :path => ['/bin/'],
         :unless => 'scli  --approve_certificate  --query_fault_set --fault_set_name b --protection_domain_name name')
     end
     it do
@@ -91,11 +91,11 @@ describe 'scaleio::protection_domain' do
     it do
       is_expected.to contain_exec('scli  --approve_certificate --add_storage_pool --storage_pool_name aa --protection_domain_name name  ').with(
         :command => 'scli  --approve_certificate --add_storage_pool --storage_pool_name aa --protection_domain_name name  ',
-        :path => '/bin/',
+        :path => ['/bin/'],
         :unless => 'scli  --approve_certificate  --query_storage_pool --storage_pool_name aa --protection_domain_name name')
       is_expected.to contain_exec('scli  --approve_certificate --add_storage_pool --storage_pool_name bb --protection_domain_name name  ').with(
         :command => 'scli  --approve_certificate --add_storage_pool --storage_pool_name bb --protection_domain_name name  ',
-        :path => '/bin/',
+        :path => ['/bin/'],
         :unless => 'scli  --approve_certificate  --query_storage_pool --storage_pool_name bb --protection_domain_name name')
     end
     it do

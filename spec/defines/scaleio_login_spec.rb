@@ -18,7 +18,7 @@ describe 'scaleio::login' do
   it do
     is_expected.to contain_exec('scli  --approve_certificate --login --password password --username admin  ').with(
       :command => 'scli  --approve_certificate --login --password password --username admin  ',
-      :path => '/bin/')
+      :path => ['/bin/'])
   end
   it do
     is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --login --password password --username admin  ')

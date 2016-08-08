@@ -10,7 +10,7 @@ describe 'scaleio::sdc' do
   context 'ensure is absent' do
     let (:params) { default_params.merge(:ensure => 'absent')}
     it 'removes sdc' do
-      is_expected.to contain_scaleio__cmd('absent').with(
+      is_expected.to contain_scaleio__cmd('SDC 1.2.3.4 absent').with(
         :action => 'remove_sdc',
         :ref => 'sdc_ip',
         :value => '1.2.3.4',
@@ -19,7 +19,7 @@ describe 'scaleio::sdc' do
     it do
       is_expected.to contain_exec('scli  --approve_certificate --remove_sdc --sdc_ip 1.2.3.4   --i_am_sure').with(
         :command => 'scli  --approve_certificate --remove_sdc --sdc_ip 1.2.3.4   --i_am_sure',
-        :path => '/bin/',)
+        :path => ['/bin/'],)
     end
     it do
       is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --remove_sdc --sdc_ip 1.2.3.4   --i_am_sure')
