@@ -72,7 +72,7 @@ describe 'scaleio::cluster' do
   end
   context 'when new_password isnt defined' do
     let :params do
-     default_params.merge({ :new_password => nil })
+     default_params.merge({ :new_password => '' })
     end
     it { is_expected.not_to contain_scaleio__cmd('set password')}
   end
@@ -93,7 +93,7 @@ describe 'scaleio::cluster' do
   end
   context 'when license_file_path doesnt exist' do
     let :params do
-      default_params.merge({ :license_file_path => nil })
+      default_params.merge({ :license_file_path => '' })
     end
     it { is_expected.not_to contain_scaleio__cmd('set license')}
   end
