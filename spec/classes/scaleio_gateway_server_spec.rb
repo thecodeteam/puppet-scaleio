@@ -1,13 +1,15 @@
 require 'spec_helper'
 
 describe 'scaleio::gateway_server' do
-
+  let(:facts) {{
+    :osfamily => 'Debian'
+  }}
   let :default_params do
   {
     :password     => '123',
     :port         => '4443',
     :im_port      => '8081',
-    :ensure	  => 'present'
+    :ensure       => 'present'
   }
   end
 
@@ -27,7 +29,6 @@ describe 'scaleio::gateway_server' do
     end
     it 'runs java8 repo' do
       is_expected.to contain_exec('add java8 repo').with(
-         :unless  => 'apt-cache search oracle-java8-installer | grep oracle-java8-installer || grep "webupd8team/java" /etc/apt/sources.list /etc/apt/sources.list.d/*',
          :command => 'add-apt-repository ppa:webupd8team/java && apt-get update')
     end
     it 'java license accepting step 1' do
@@ -59,8 +60,7 @@ describe 'scaleio::gateway_server' do
         :ensure  => 'present',
         :line    => 'http.port=8081',
         :path    => '/opt/emc/scaleio/gateway/conf/catalina.properties',
-        :match   => '^http.port=',
-        :require => 'Package[emc-scaleio-gateway]',)
+        :match   => '^http.port=')
     end
     it 'runs service' do
       is_expected.to contain_service('scaleio-gateway').with_ensure('running')
@@ -120,9 +120,7 @@ describe 'scaleio::gateway_server' do
     end
 
     it 'doesnt contains anything' do
-      is_expected.to contain_package('emc-scaleio-gateway').with_ensure('purged')
-        .with(:provider  => 'dpkg')
-
+      is_expected.to contain_package('emc-scaleio-gateway').with_ensure('absent')
     end
   end
 end

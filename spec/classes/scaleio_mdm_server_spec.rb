@@ -1,6 +1,9 @@
 require 'spec_helper'
 
 describe 'scaleio::mdm_server' do
+  let(:facts) {{
+    :osfamily => 'Debian'
+  }}
 
   it { is_expected.to contain_class('scaleio::mdm_server') }
 

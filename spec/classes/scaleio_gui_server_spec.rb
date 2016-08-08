@@ -1,6 +1,9 @@
 require 'spec_helper'
 
 describe 'scaleio::gui_server' do
+  let(:facts) {{
+    :osfamily => 'Debian'
+  }}
 
   it { is_expected.to contain_class('scaleio::gui_server')}
 
