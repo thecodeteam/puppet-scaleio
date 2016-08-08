@@ -8,7 +8,6 @@ describe 'scaleio::storage_pool' do
     :ensure => 'present',  # present|absent - Add or remove storage pool
     :protection_domain => 'domain',
     :scanner_mode => '',  # 'device_only'|'data_comparison'|'disable'
-#    :scanner_bandwidth_limit => '25',
     }
   end
   let (:params) { default_params }
@@ -71,92 +70,6 @@ describe 'scaleio::storage_pool' do
       :path => ['/bin/'],)}
     it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --set_checksum_mode --storage_pool_name name --protection_domain_name domain  --disable_checksum')}
   end
-
-### Checks rebuild_mode
-
-#  context 'with rebuild_mode is enabled' do
-#    let (:params) { default_params.merge(:rebuild_mode => 'enable')}
-
-#    it 'sets rebuild_mode' do
-#      is_expected.to contain_scaleio__set('set_rebuild_mode').with(
-#        :is_defined => 'enable',
-#        :change => "--enable_rebuild --i_am_sure")
-#    end
-
-#    it { is_expected.to contain_scaleio__cmd('set_rebuild_mode').with(
-#      :action => 'set_rebuild_mode',
-#      :ref => 'storage_pool_name',
-#      :value => 'name',
-#      :scope_entity => 'protection_domain',
-#      :scope_value => 'domain',
-#      :extra_opts => "--enable_rebuild --i_am_sure")}
-#    it { is_expected.to contain_exec('scli  --approve_certificate --set_rebuild_mode    --enable_rebuild --i_am_sure').with(
-#      :command => 'scli  --approve_certificate --set_rebuild_mode    --enable_rebuild --i_am_sure',
-#      :path => '/bin/',)}
-#    it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --set_rebuild_mode    --enable_rebuild --i_am_sure')}
-#  end
-#  context 'with rebuild_mode is disabled' do
-#    let (:params) { default_params.merge(:rebuild_mode => 'disable')}
-#    it 'sets rebuild_mode' do
-#      is_expected.to contain_scaleio__set('set_rebuild_mode').with(
-#        :is_defined => 'disable',
-#        :change => "--disable_rebuild --i_am_sure")
-#    end
-#    it { is_expected.to contain_scaleio__cmd('set_rebuild_mode').with(
-#      :action => 'set_rebuild_mode',
-#      :ref => 'storage_pool_name',
-#      :value => 'name',
-#      :scope_entity => 'protection_domain',
-#      :scope_value => 'domain',
-#      :extra_opts => "--disable_rebuild --i_am_sure")}
-#    it { is_expected.to contain_exec('scli  --approve_certificate --set_rebuild_mode    --disable_rebuild --i_am_sure').with(
-#      :command => 'scli  --approve_certificate --set_rebuild_mode    --disable_rebuild --i_am_sure',
-#      :path => '/bin/',)}
-#    it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --set_rebuild_mode    --disable_rebuild --i_am_sure')}
-#  end
-
-### Checks rebalance_mode
-
-#  context 'with rebalance_mode is enabled' do
-#    let (:params) { default_params.merge(:rebalance_mode => 'enable')}
-#
-#    it 'sets rebalance_mode' do
-#      is_expected.to contain_scaleio__set('set_rebalance_mode').with(
-#        :is_defined => 'enable',
-#        :change => "--enable_rebalance --i_am_sure")
-#    end
-#
-#    it { is_expected.to contain_scaleio__cmd('set_rebalance_mode').with(
-#      :action => 'set_rebalance_mode',
-#      :ref => 'storage_pool_name',
-#      :value => 'name',
-#      :scope_entity => 'protection_domain',
-#      :scope_value => 'domain',
-#      :extra_opts => "--enable_rebalance --i_am_sure")}
-#    it { is_expected.to contain_exec('scli  --approve_certificate --set_rebalance_mode    --enable_rebalance --i_am_sure').with(
-#      :command => 'scli  --approve_certificate --set_rebalance_mode    --enable_rebalance --i_am_sure',
-#      :path => '/bin/',)}
-#    it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --set_rebalance_mode    --enable_rebalance --i_am_sure')}
-#  end
-#  context 'with rebalance_mode is disabled' do
-#    let (:params) { default_params.merge(:rebalance_mode => 'disable')}
-#    it 'sets rebalance_mode' do
-#      is_expected.to contain_scaleio__set('set_rebalance_mode').with(
-#        :is_defined => 'disable',
-#        :change => "--disable_rebalance --i_am_sure")
-#    end
-#    it { is_expected.to contain_scaleio__cmd('set_rebalance_mode').with(
-#      :action => 'set_rebalance_mode',
-#      :ref => 'storage_pool_name',
-#      :value => 'name',
-#      :scope_entity => 'protection_domain',
-#      :scope_value => 'domain',
-#      :extra_opts => "--disable_rebalance --i_am_sure")}
-#    it { is_expected.to contain_exec('scli  --approve_certificate --set_rebalance_mode    --disable_rebalance --i_am_sure').with(
-#      :command => 'scli  --approve_certificate --set_rebalance_mode    --disable_rebalance --i_am_sure',
-#      :path => '/bin/',)}
-#    it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --set_rebalance_mode    --disable_rebalance --i_am_sure')}
-#  end
 
 ### Checks zero_padding_policy
 
@@ -340,75 +253,7 @@ describe 'scaleio::storage_pool' do
     it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --modify_spare_policy --storage_pool_name name --protection_domain_name domain  --spare_percentage disable --i_am_sure')}
   end
 
-### Checks rebalance_parallelism_limit
-
-#  context 'with rebalance_parallelism_limit is defined' do
-#    let (:params) { default_params.merge(:rebalance_parallelism_limit => '10')}
-#
-#    it 'modifies rebalance_parallelism_limit' do
-#      is_expected.to contain_scaleio__set('set_rebuild_rebalance_parallelism').with(
-#        :is_defined => '10',
-#        :change => "--limit 10")
-#    end
-#
-#    it { is_expected.to contain_scaleio__cmd('set_rebuild_rebalance_parallelism').with(
-#      :action => 'set_rebuild_rebalance_parallelism',
-#      :ref => 'storage_pool_name',
-#      :value => 'name',
-#      :scope_entity => 'protection_domain',
-#      :scope_value => 'domain',
-#      :extra_opts => "--limit 10")}
-#    it { is_expected.to contain_exec('scli  --approve_certificate --set_rebuild_rebalance_parallelism    --limit 10').with(
-#      :command => 'scli  --approve_certificate --set_rebuild_rebalance_parallelism    --limit 10',
-#      :path => '/bin/',)}
-#    it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --set_rebuild_rebalance_parallelism    --limit 10')}
-#  end
-#  context 'with rebalance_parallelism_limit is undefined' do
-#    it 'modifies rebalance_parallelism_limit' do
-#      is_expected.to contain_scaleio__set('set_rebuild_rebalance_parallelism').with(
-#        :is_defined => nil,
-#        :change => "--limit ")
-#    end
-#    it { is_expected.not_to contain_scaleio__cmd('set_rebuild_rebalance_parallelism')}
-#    it { is_expected.not_to contain_exec('scli  --approve_certificate --set_rebuild_rebalance_parallelism    --limit disable')}
-#    it { is_expected.not_to contain_notify('SCLI COMMAND: scli  --approve_certificate --set_rebuild_rebalance_parallelism    --limit disable')}
-#  end
-#  context 'with rebalance_parallelism_limit is string' do
-#    let (:params) { default_params.merge(:rebalance_parallelism_limit => 'disable')}
-#    it 'modifies rebalance_parallelism_limit' do
-#      is_expected.to contain_scaleio__set('set_rebuild_rebalance_parallelism').with(
-#        :is_defined => 'disable',
-#        :change => "--limit disable")
-#    end
-#    it { is_expected.to contain_scaleio__cmd('set_rebuild_rebalance_parallelism').with(
-#      :action => 'set_rebuild_rebalance_parallelism',
-#      :ref => 'storage_pool_name',
-#      :value => 'name',
-#      :scope_entity => 'protection_domain',
-#      :scope_value => 'domain',
-#      :extra_opts => "--limit disable")}
-#    it { is_expected.to contain_exec('scli  --approve_certificate --set_rebuild_rebalance_parallelism    --limit disable').with(
-#      :command => 'scli  --approve_certificate --set_rebuild_rebalance_parallelism    --limit disable',
-#      :path => '/bin/',)}
-#    it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --set_rebuild_rebalance_parallelism    --limit disable')}
-#  end
-
-
-
 ### Checks background_device_scanner
-
-#  context 'with scanner_mode is default' do
-
-#    it 'sets background_device_scanner' do
-#      is_expected.to contain_scaleio__set('storage pool name _background_device_scanner').with(
-#        :is_defined => '',
-#        :change => ' ')
-#    end
-
-#    it { is_expected.to contain_scaleio__cmd('storage pool name _background_device_scanner')}
-#    it { is_expected.not_to contain_exec('scli  --approve_certificate --_background_device_scanner     ')}
-#    it { is_expected.not_to contain_notify('SCLI COMMAND: scli  --approve_certificate --_background_device_scanner     ')}
-#  end
 
   context 'with scanner_mode is disabled' do
     let (:params) { default_params.merge(:scanner_mode => 'disable')}
