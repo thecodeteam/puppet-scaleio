@@ -23,6 +23,10 @@ describe 'scaleio::gateway_server' do
         :proto  => 'tcp',
         :action => 'accept')
     end
+    it 'contains install common packages for gateway' do
+      is_expected.to contain_scaleio__common_server('install common packages for gateway').with(
+        :ensure_java=>'present')
+    end
     it 'installs utilities' do
       is_expected.to contain_package('numactl').with_ensure('installed')
       is_expected.to contain_package('libaio1').with_ensure('installed')

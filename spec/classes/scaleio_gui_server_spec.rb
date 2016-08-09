@@ -12,7 +12,7 @@ describe 'scaleio::gui_server' do
       { :ensure   => 'absent' }
     end
     it 'removes gui' do
-      is_expected.to contain_package('emc_scaleio_gui').with_ensure('absent')
+      is_expected.to contain_package('EMC_ScaleIO_GUI').with_ensure('absent')
     end
   end
 
@@ -21,7 +21,10 @@ describe 'scaleio::gui_server' do
     let :params do
       { :ensure   => 'present' }
     end
-
+    it 'contains install common packages for GUI' do
+      is_expected.to contain_scaleio__common_server('install common packages for GUI').with(
+        :ensure_java=>'present')
+    end
     it 'installs utilities' do
       is_expected.to contain_package('numactl').with_ensure('installed')
       is_expected.to contain_package('libaio1').with_ensure('installed')

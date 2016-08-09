@@ -28,6 +28,10 @@ describe 'scaleio::sdc' do
 
   context 'ensure is present' do
     let (:params) { default_params.merge(:ensure => 'present')}
+    it { is_expected.to contain_exec("Apply high_performance profile for SDC 1.2.3.4").with(
+      :command => 'scli  --set_performance_parameters --all_sdc --apply_to_mdm --profile high_performance',
+      :path    => '/bin:/usr/bin')}
+
     it 'doesnt removes sdc' do
       is_expected.not_to contain_scaleio__cmd(:ensure)
     end
