@@ -16,6 +16,9 @@ describe 'scaleio::mdm_server' do
         :proto  => 'tcp',
         :action => 'accept')
     end
+    it 'contains install common packages for MDM' do
+      is_expected.to contain_scaleio__common_server('install common packages for MDM')
+    end
     it 'has utilities installed' do
       is_expected.to contain_package('numactl').with_ensure('installed')
       is_expected.to contain_package('libaio1').with_ensure('installed')

@@ -7,7 +7,8 @@ describe 'scaleio::storage_pool' do
     :sio_name => 'name',
     :ensure => 'present',  # present|absent - Add or remove storage pool
     :protection_domain => 'domain',
-    :scanner_mode => '',  # 'device_only'|'data_comparison'|'disable'
+    :scanner_mode => 'disable',  # 'device_only'|'data_comparison'|'disable'
+    :rfcache_usage => 'dont_use'
     }
   end
   let (:params) { default_params }
@@ -258,7 +259,6 @@ describe 'scaleio::storage_pool' do
 ### Checks background_device_scanner
 
   context 'with scanner_mode is disabled' do
-    let (:params) { default_params.merge(:scanner_mode => 'disable')}
     it 'sets disable_background_device_scanner' do
       is_expected.to contain_scaleio__set('storage pool domain:name disable_background_device_scanner').with(
         :is_defined => 'disable',
@@ -321,4 +321,48 @@ describe 'scaleio::storage_pool' do
       :path => ['/bin/'],)}
     it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --data_comparison_background_device_scanner --storage_pool_name name --protection_domain_name domain   ')}
   end
+
+### Checks rmcache_usage
+
+  context 'with rfcache_usage is dont_used' do
+    it 'sets rfcache_usage' do
+      is_expected.to contain_scaleio__set('storage pool domain:name set_rfcache_usage').with(
+        :is_defined => 'dont_use',
+        :change => "--dont_use_rfcache --i_am_sure")
+    end
+    it { is_expected.to contain_scaleio__cmd('storage pool domain:name set_rfcache_usage').with(
+      :action => 'set_rfcache_usage',
+      :ref => 'storage_pool_name',
+      :value => 'name',
+      :scope_entity => 'protection_domain',
+      :scope_value => 'domain',
+      :extra_opts => "--dont_use_rfcache --i_am_sure")}
+    it { is_expected.to contain_exec('scli  --approve_certificate --set_rfcache_usage --storage_pool_name name --protection_domain_name domain  --dont_use_rfcache --i_am_sure').with(
+      :command => 'scli  --approve_certificate --set_rfcache_usage --storage_pool_name name --protection_domain_name domain  --dont_use_rfcache --i_am_sure',
+      :path => ['/bin/'],)}
+    it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --set_rfcache_usage --storage_pool_name name --protection_domain_name domain  --dont_use_rfcache --i_am_sure')}
+  end
+
+  context 'with rfcache_usage is used' do
+    let (:params) { default_params.merge(:rfcache_usage => 'use')}
+
+    it 'sets rfcache_usage' do
+      is_expected.to contain_scaleio__set('storage pool domain:name set_rfcache_usage').with(
+        :is_defined => 'use',
+        :change => "--use_rfcache --i_am_sure")
+    end
+
+    it { is_expected.to contain_scaleio__cmd('storage pool domain:name set_rfcache_usage').with(
+      :action => 'set_rfcache_usage',
+      :ref => 'storage_pool_name',
+      :value => 'name',
+      :scope_entity => 'protection_domain',
+      :scope_value => 'domain',
+      :extra_opts => "--use_rfcache --i_am_sure")}
+    it { is_expected.to contain_exec('scli  --approve_certificate --set_rfcache_usage --storage_pool_name name --protection_domain_name domain  --use_rfcache --i_am_sure').with(
+      :command => 'scli  --approve_certificate --set_rfcache_usage --storage_pool_name name --protection_domain_name domain  --use_rfcache --i_am_sure',
+      :path => ['/bin/'],)}
+    it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --set_rfcache_usage --storage_pool_name name --protection_domain_name domain  --use_rfcache --i_am_sure')}
+  end
+
 end
