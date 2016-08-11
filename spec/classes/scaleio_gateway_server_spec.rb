@@ -4,13 +4,11 @@ describe 'scaleio::gateway_server' do
   let(:facts) {{
     :osfamily => 'Debian'
   }}
-  let :default_params do
-  {
+  let :default_params do {
     :password     => '123',
     :port         => '4443',
     :im_port      => '8081',
-    :ensure       => 'present'
-  }
+    :ensure       => 'present'}
   end
 
   it {is_expected.to contain_class('scaleio::gateway_server')}
@@ -71,7 +69,6 @@ describe 'scaleio::gateway_server' do
     end
 
     context 'defined mdm_ip' do
-
       let :params do
         {:mdm_ips => '1.2.3.4,1.2.3.5'}
       end
@@ -85,29 +82,25 @@ describe 'scaleio::gateway_server' do
           :notify  => 'Service[scaleio-gateway]')
       end
     end
-
     context 'undefined mdm_ip' do
-
       let :params do
         {:mdm_ips => ''}
       end
-
       it 'doesnot connect to mdm' do
         should_not contain_file_line('Set MDM IP addresses')
       end
     end
+
     context 'defined password' do
       let :params do
         {:password => 'password'}
       end
-
       it 'connect to mdm' do
         is_expected.to contain_exec('Set gateway admin password').with(
           :command => "java -jar /opt/emc/scaleio/gateway/webapps/ROOT/resources/install-CLI.jar --reset_password 'password' --config_file /opt/emc/scaleio/gateway/webapps/ROOT/WEB-INF/classes/gatewayUser.properties",
           :path => '/etc/alternatives')
       end
     end
-
     context 'undefined password' do
       let :params do
         {:password => ''}
@@ -118,11 +111,9 @@ describe 'scaleio::gateway_server' do
     end
   end
   context 'ensure is absent' do
-
     let :params do
       { :ensure   => 'absent' }
     end
-
     it 'doesnt contains anything' do
       is_expected.to contain_package('emc-scaleio-gateway').with_ensure('absent')
     end

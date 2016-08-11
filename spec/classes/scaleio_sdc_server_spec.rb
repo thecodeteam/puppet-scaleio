@@ -4,11 +4,9 @@ describe 'scaleio::sdc_server' do
   let(:facts) {{
     :osfamily => 'Debian'
   }}
-
   let (:default_params) {{ :ensure => 'present' }}
 
   it { is_expected.to contain_class('scaleio::sdc_server')}
-
   it 'contains install common packages for SDC' do
     is_expected.to contain_scaleio__common_server('install common packages for SDC')
   end
@@ -94,9 +92,10 @@ describe 'scaleio::sdc_server' do
       :mode   => '0755')
   end
 
-  context 'with mdm_ip' do
-    let (:params) { {:mdm_ip => '1.2.3.4'} }
-
+  context 'with mdm_ip and ensure properties' do
+    let (:params) {{
+        :mdm_ip => '1.2.3.4',
+        :ensure_properties => 'present'}}
     it 'sets mdm ip addresses' do
       is_expected.to contain_file_line('Set MDM IP addresses in drv_cfg.txt').with(
         :ensure  => 'present',
@@ -105,16 +104,31 @@ describe 'scaleio::sdc_server' do
         :match   => '^mdm .*',
         :require => 'Package[emc-scaleio-sdc]',
       )
+      is_expected.to contain_notify('FTP to use for scini driver: ftp://QNzgdxXix:Aw3wFAwAq3@ftp.emc.com, ftp.emc.com, ftp, QNzgdxXix, Aw3wFAwAq3')
     end
-    it { is_expected.to contain_notify('FTP to use for scini driver: ftp://QNzgdxXix:Aw3wFAwAq3@ftp.emc.com, ftp.emc.com, ftp, QNzgdxXix, Aw3wFAwAq3')}
   end
-
-  context 'with undefined mdm_ip' do
-    let (:params) { { :mdm_ip => '' } }
+  context 'with mdm_ip and absent ensure properties' do
+    let (:params) {{
+        :mdm_ip => '1.2.3.4',
+        :ensure_properties => 'absent'}}
     it 'doesnot connect to mdm' do
       is_expected.not_to contain_file_line('Set MDM IP addresses in drv_cfg.txt')
+      is_expected.not_to contain_file_line('Reset MDM IP addresses in drv_cfg.txt')
     end
-    let (:params) { { :ensure_properties => 'absent' }}
+  end
+  context 'with undefined mdm_ip and present ensure properties' do
+    let (:params) {{ 
+      :mdm_ip => '',
+      :ensure_properties => 'present' }}
+    it 'doesnot connect to mdm' do
+      is_expected.not_to contain_file_line('Set MDM IP addresses in drv_cfg.txt')
+      is_expected.not_to contain_file_line('Reset MDM IP addresses in drv_cfg.txt')
+    end
+  end
+  context 'with undefined mdm_ip and absent ensure properties' do
+    let (:params) {{
+      :mdm_ip => '',
+      :ensure_properties => 'absent' }}
     it 'reset mdm ips' do
       is_expected.to contain_file_line('Reset MDM IP addresses in drv_cfg.txt').with(
           :ensure            => 'absent',
@@ -123,7 +137,27 @@ describe 'scaleio::sdc_server' do
           :match             => '^mdm .*',
           :match_for_absence => true,
           :require           => 'Package[emc-scaleio-sdc]',
-          :replace           => false)
+          :replace           => false,
+          :notify            => 'Service[scini]')
+    end
+  end
+
+  context 'with ftp' do
+    let (:params) {{
+        :ftp => 'ftp://ftp'}}
+    it do
+      is_expected.to contain_scaleio__driver_sync('scini driver sync').with(
+        :driver  => 'scini',
+        :ftp     => 'ftp://ftp',
+        :require => 'Package[emc-scaleio-sdc]')
+      is_expected.to contain_notify('FTP to use for scini driver: ftp://ftp, , ftp, ftp, ')
+    end
+  end
+  context 'without ftp' do
+    let (:params) {{
+        :ftp => ''}}
+    it do
+      is_expected.not_to contain_scaleio__driver_sync('scini driver sync')
     end
   end
 end
