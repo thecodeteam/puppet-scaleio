@@ -107,4 +107,36 @@ describe 'scaleio::protection_domain' do
       is_expected.to contain_notify('SCLI UNLESS: scli  --approve_certificate  --query_storage_pool --storage_pool_name bb --protection_domain_name name')
     end
   end
+
+  context 'with zero-padding enabled' do
+    let :params do
+      default_params.merge({ :storage_pools => ['sp'], :zero_padding_policy => 'enable' })
+    end
+    it { is_expected.to contain_scaleio__cmd('sp,2').with(
+      :action         => 'present',
+      :ref            => 'name',
+      :value_in_title => 'true',
+      :scope_entity   => 'protection_domain',
+      :scope_value    => 'name',
+      :require        => 'Scaleio::Cmd[Protection domain title present]')}
+    it { is_expected.to contain_exec('scli  --approve_certificate --add_storage_pool --storage_pool_name sp --protection_domain_name name  ').with(
+        :command => 'scli  --approve_certificate --add_storage_pool --storage_pool_name sp --protection_domain_name name  ',
+        :path => ['/bin/'],
+        :unless => 'scli  --approve_certificate  --query_storage_pool --storage_pool_name sp --protection_domain_name name')}
+    it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --add_storage_pool --storage_pool_name sp --protection_domain_name name  ')}
+    it { is_expected.to contain_notify('SCLI UNLESS: scli  --approve_certificate  --query_storage_pool --storage_pool_name sp --protection_domain_name name')}
+
+    it { is_expected.to contain_scaleio__cmd('sp,3').with(
+      :action         => 'modify_zero_padding_policy',
+      :ref            => 'storage_pool_name',
+      :value_in_title => 'true',
+      :scope_entity   => 'protection_domain',
+      :scope_value    => 'name',
+      :extra_opts     => "--enable_zero_padding",
+      :require        => 'Scaleio::Cmd[sp,2]')}
+    it { is_expected.to contain_exec('scli  --approve_certificate --modify_zero_padding_policy --storage_pool_name sp --protection_domain_name name  --enable_zero_padding').with(
+        :command => 'scli  --approve_certificate --modify_zero_padding_policy --storage_pool_name sp --protection_domain_name name  --enable_zero_padding',
+        :path => ['/bin/'])}
+    it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --modify_zero_padding_policy --storage_pool_name sp --protection_domain_name name  --enable_zero_padding')}
+  end
 end

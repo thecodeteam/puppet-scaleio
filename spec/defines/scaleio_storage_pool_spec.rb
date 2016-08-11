@@ -322,7 +322,7 @@ describe 'scaleio::storage_pool' do
     it { is_expected.to contain_notify('SCLI COMMAND: scli  --approve_certificate --data_comparison_background_device_scanner --storage_pool_name name --protection_domain_name domain   ')}
   end
 
-### Checks rmcache_usage
+### Checks rfcache_usage
 
   context 'with rfcache_usage is dont_used' do
     it 'sets rfcache_usage' do
