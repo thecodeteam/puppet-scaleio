@@ -106,13 +106,3 @@ describe 'scaleio::driver_sync' do
     :path    => ['/bin/emc/scaleio/scini_sync/', '/bin/', '/usr/bin', '/sbin'],
     :notify  => 'Service[scini]')}
 end
-
-#define config_sync($driver, $config) {
-#  file_line { "config_sync ${title}":
-#    ensure => present,
-#    path   => "/bin/emc/scaleio/${driver}_sync/driver_sync.conf",
-#    match  => "^${title}",
-#    line   => "${title}=${config[$title]}",
-#  }
-#}
-
