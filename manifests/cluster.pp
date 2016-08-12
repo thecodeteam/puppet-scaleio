@@ -69,19 +69,17 @@ define scaleio::cluster (
       ref    => 'license_file',
       value  => $license_file_path}
   }
+  $mdm_opts = $::mdm_ips ? {
+    undef   => '',
+    default => "--mdm_ip ${::mdm_ips}"
+  }
   if $performance_profile {
-    $mdm_opts = $::mdm_ips ? {
-      undef   => '',
-      default => "--mdm_ip ${::mdm_ips}"}
     exec { 'Apply high_performance profile for all':
       command => "scli ${mdm_opts} --set_performance_parameters --all_sdc --all_sds --apply_to_mdm --profile ${performance_profile}",
       path    => '/bin:/usr/bin',
     }
   }
   if $capacity_high_alert_threshold and $capacity_critical_alert_threshold {
-      $mdm_opts = $::mdm_ips ? {
-        undef   => '',
-        default => "--mdm_ip ${::mdm_ips}"}
       $opt_h = "--capacity_high_threshold ${capacity_high_alert_threshold}"
       $opt_c = "--capacity_critical_threshold ${capacity_critical_alert_threshold}"
       exec { 'Set capacity allert thresholds':
@@ -106,7 +104,7 @@ define scaleio::cluster (
     } ->
     exec { 'create_client_user':
       unless  => "scli --query_user --username ${user}",
-      command => "/root/create_client_user.sh ${user} ${client_password}",
+      command => "/root/create_client_user.sh ${user} ${client_password} ${::mdm_ips}",
       path    => '/bin:/usr/bin',
     }
   }
