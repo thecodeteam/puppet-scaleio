@@ -103,7 +103,7 @@ define scaleio::cluster (
       group  => 'root',
     } ->
     exec { 'create_client_user':
-      unless  => "scli --query_user --username ${user}",
+      unless  => "scli ${mdm_opts} --query_user --username ${user}",
       command => "/root/create_client_user.sh ${user} ${client_password} ${::mdm_ips}",
       path    => '/bin:/usr/bin',
     }
