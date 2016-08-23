@@ -186,8 +186,8 @@ describe 'scaleio::cluster' do
       :owner  => 'root',
       :group  => 'root')}
     it { is_expected.to contain_exec('create_client_user').with(
-      :unless  => 'scli --query_user --username scaleio_client',
-      :command => '/root/create_client_user.sh scaleio_client client_password',
+      :unless  => 'scli  --query_user --username scaleio_client',
+      :command => '/root/create_client_user.sh scaleio_client client_password ',
       :path    => '/bin:/usr/bin')}
   end
 end
