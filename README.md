@@ -130,7 +130,7 @@ It's possible to deploy from local directory by the command (replace <my_puppet_
     sio_name=>'sds3', ips=>'10.0.0.3', ip_roles=>'all', protection_domain=>'pd', storage_pools=>'sp1', device_paths=>'/dev/sdb' }"
   ```
 
-  Set password for user 'scaleio_client'
+  Set password for user 'scaleio_client' (non-admin user account)
   ```
   puppet apply "scaleio::cluster { 'cluster': client_password=>'Client_Password' }"
   ```
