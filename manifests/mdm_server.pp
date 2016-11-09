@@ -1,24 +1,21 @@
 # Configure ScaleIO Gateway service installation
 
 class scaleio::mdm_server (
-  $ensure                   = 'present',  # present|absent - Install or remove MDM service
-  $is_manager               = undef,      # 0|1 - Tiebreaker or Manager
-  $master_mdm_name          = undef,      # string - Name of the master node
-  $mdm_ips                  = undef,      # string - MDM IPs
-  $mdm_management_ips       = undef,      # string - MDM management IPs
+  $ensure             = 'present',  # present|absent - Install or remove MDM service
+  $is_manager         = undef,      # 0|1 - Tiebreaker or Manager
+  $master_mdm_name    = undef,      # string - Name of the master node
+  $mdm_ips            = undef,      # string - MDM IPs
+  $mdm_management_ips = undef,      # string - MDM management IPs
+  $pkg_src            = undef,      # string - URL where packages are placed (for example: ftp://ftp.emc.com/Ubuntu/2.0.10000.2072)
   )
 {
-  $mdm_package = $::osfamily ? {
-    'RedHat' => 'EMC-ScaleIO-mdm',
-    'Debian' => 'emc-scaleio-mdm',
-  }
   $provider = "${::osfamily}${::operatingsystemmajrelease}" ? {
     'RedHat6' => 'upstart',
     default  => undef,
   }
 
   if $ensure == 'absent' {
-    package { [$mdm_package]:
+    scaleio::package { 'mdm':
       ensure => 'absent',
     }
   }
@@ -32,14 +29,15 @@ class scaleio::mdm_server (
     package { ['mutt', 'python', 'python-paramiko']:
       ensure => installed,
     } ->
-    package { [$mdm_package]:
-      ensure => $ensure,
+    scaleio::package { 'mdm':
+      ensure  => $ensure,
+      pkg_src => $pkg_src,
     }
     service { 'mdm':
       ensure    => 'running',
       enable    => true,
       hasstatus => true,
-      require   => Package[$mdm_package],
+      require   => Scaleio::Package['mdm'],
       provider  => $provider
     }
 
@@ -48,7 +46,7 @@ class scaleio::mdm_server (
         path    => '/opt/emc/scaleio/mdm/cfg/conf.txt',
         line    => "actor_role_is_manager=${is_manager}",
         match   => '^actor_role_is_manager',
-        require => Package[$mdm_package],
+        require => Scaleio::Package['mdm'],
         notify  => Service['mdm'],
         before  => [Exec['create_cluster']],
       }

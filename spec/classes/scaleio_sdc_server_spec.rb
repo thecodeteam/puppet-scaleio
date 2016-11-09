@@ -7,6 +7,7 @@ describe 'scaleio::sdc_server' do
   let (:default_params) {{ :ensure => 'present' }}
 
   it { is_expected.to contain_class('scaleio::sdc_server')}
+
   it 'contains install common packages for SDC' do
     is_expected.to contain_scaleio__common_server('install common packages for SDC')
   end
@@ -16,8 +17,14 @@ describe 'scaleio::sdc_server' do
   it 'installs libaio1 package' do
     is_expected.to contain_package('libaio1').with_ensure('installed')
   end
-  it 'installs emc-scaleio-sdc package' do
-    is_expected.to contain_package('emc-scaleio-sdc').with_ensure('present')
+
+  context 'with pkg_src' do
+    let (:params) {{
+      :pkg_src => 'ftp://ftp',
+    }}
+    it 'installs emc-scaleio-sdc package' do
+      is_expected.to contain_scaleio__package('sdc').with_ensure('present')
+    end
   end
 
   it do
@@ -83,7 +90,7 @@ describe 'scaleio::sdc_server' do
     is_expected.to contain_scaleio__driver_sync('scini driver sync').with(
       :driver  => 'scini',
       :ftp     => 'default',
-      :require => 'Package[emc-scaleio-sdc]',)
+      :require => 'Scaleio::Package[sdc]',)
   end
   it 'ensures sync directory present' do
     is_expected.to contain_file('Ensure sync directory present: ').with(
@@ -102,7 +109,7 @@ describe 'scaleio::sdc_server' do
         :line    => 'mdm 1.2.3.4',
         :path    => '/bin/emc/scaleio/drv_cfg.txt',
         :match   => '^mdm .*',
-        :require => 'Package[emc-scaleio-sdc]',
+        :require => 'Scaleio::Package[sdc]',
       )
       is_expected.to contain_notify('FTP to use for scini driver: ftp://QNzgdxXix:Aw3wFAwAq3@ftp.emc.com, ftp.emc.com, ftp, QNzgdxXix, Aw3wFAwAq3')
     end
@@ -136,7 +143,7 @@ describe 'scaleio::sdc_server' do
           :path              => '/bin/emc/scaleio/drv_cfg.txt',
           :match             => '^mdm .*',
           :match_for_absence => true,
-          :require           => 'Package[emc-scaleio-sdc]',
+          :require           => 'Scaleio::Package[sdc]',
           :replace           => false,
           :notify            => 'Service[scini]')
     end
@@ -144,18 +151,18 @@ describe 'scaleio::sdc_server' do
 
   context 'with ftp' do
     let (:params) {{
-        :ftp => 'ftp://ftp'}}
+        :drv_src => 'ftp://ftp'}}
     it do
       is_expected.to contain_scaleio__driver_sync('scini driver sync').with(
         :driver  => 'scini',
         :ftp     => 'ftp://ftp',
-        :require => 'Package[emc-scaleio-sdc]')
+        :require => 'Scaleio::Package[sdc]')
       is_expected.to contain_notify('FTP to use for scini driver: ftp://ftp, , ftp, ftp, ')
     end
   end
   context 'without ftp' do
     let (:params) {{
-        :ftp => ''}}
+        :drv_src => ''}}
     it do
       is_expected.not_to contain_scaleio__driver_sync('scini driver sync')
     end

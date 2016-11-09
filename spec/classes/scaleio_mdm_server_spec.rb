@@ -27,7 +27,7 @@ describe 'scaleio::mdm_server' do
       is_expected.to contain_package('python-paramiko').with_ensure('installed')
     end
     it 'installs mdm package' do
-      is_expected.to contain_package('emc-scaleio-mdm').with_ensure('present')
+      is_expected.to contain_scaleio__package('mdm').with_ensure('present')
     end
     it 'runs mdm service' do
       is_expected.to contain_service('mdm').with(
@@ -41,8 +41,7 @@ describe 'scaleio::mdm_server' do
         :command => 'sleep 2 ; scli --query_cluster --approve_certificate || scli --approve_certificate --accept_license --create_mdm_cluster --use_nonsecure_communication --master_mdm_name  --master_mdm_ip  ',
         :path => '/bin:/usr/bin',
         :onlyif => "test -n ''",
-        :require => 'Service[mdm]',
-)
+        :require => 'Service[mdm]',)
     end
 
     context 'with defined is_manager' do
@@ -52,10 +51,9 @@ describe 'scaleio::mdm_server' do
           :path    => '/opt/emc/scaleio/mdm/cfg/conf.txt',
           :line    => 'actor_role_is_manager=true',
           :match   => '^actor_role_is_manager',
-          :require => 'Package[emc-scaleio-mdm]',
+          :require => 'Scaleio::Package[mdm]',
           :notify  => 'Service[mdm]',
-          :before  => 'Exec[create_cluster]',
-        )
+          :before  => 'Exec[create_cluster]',)
       end
     end
     context 'with undefined is_manager' do
@@ -68,7 +66,7 @@ describe 'scaleio::mdm_server' do
     let (:params) {{ :ensure => 'absent' }}
 
     it 'doesnot installs mdm package' do
-      is_expected.to contain_package('emc-scaleio-mdm').with_ensure('absent')
+      is_expected.to contain_scaleio__package('mdm').with_ensure('absent')
     end
   end
 end

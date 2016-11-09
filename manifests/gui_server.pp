@@ -1,23 +1,20 @@
 # Configure ScaleIO GUI installation
 
 class scaleio::gui_server (
-  $ensure = 'present',  # present|absent - Install or remove GUI
+  $ensure  = 'present',  # present|absent - Install or remove GUI
+  $pkg_src = undef,      # string - URL where packages are placed (for example: ftp://ftp.emc.com/Ubuntu/2.0.10000.2072)
 )
 {
-  $gui_package = $::osfamily ? {
-    'RedHat' => 'EMC-ScaleIO-gui',
-    'Debian' => 'EMC_ScaleIO_GUI',
-  }
-
   if $ensure == 'absent' {
-    package { $gui_package:
+    scaleio::package { 'gui':
       ensure => absent,
     }
   }
   else {
     scaleio::common_server { 'install common packages for GUI': ensure_java=>'present' } ->
-    package { $gui_package:
+    scaleio::package { 'gui':
       ensure  => installed,
+      pkg_src => $pkg_src,
     }
   }
 

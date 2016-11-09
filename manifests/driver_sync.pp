@@ -10,7 +10,8 @@ define scaleio::driver_sync(
   }
 
   $ftp_split = split($ftp_url, '@')
-  $ftp_host = $ftp_split[1]
+  $ftp_split_host = split($ftp_split[1], '/')
+  $ftp_host = $ftp_split_host[0]
   $ftp_proto_split = split($ftp_split[0], '://')
   $ftp_proto = $ftp_proto_split[0]
   $ftp_creds = split($ftp_proto_split[1], ':')

@@ -4,6 +4,7 @@ describe 'scaleio::sds_server' do
   let(:facts) {{
     :osfamily => 'Debian'
   }}
+  let (:default_params) {{ :ensure => 'present' }}
 
   it { is_expected.to contain_class('scaleio::sds_server') }
 
@@ -20,9 +21,16 @@ describe 'scaleio::sds_server' do
   it 'installs common packages for SDS' do
     is_expected.to contain_scaleio__common_server('install common packages for SDS')
   end
-  it 'installs sds package' do
-    is_expected.to contain_package('emc-scaleio-sds').with_ensure('present')
+
+  context 'with pkg_src' do
+    let (:params) {{
+      :pkg_src => 'ftp://ftp',
+    }}
+    it 'installs sds package' do
+      is_expected.to contain_scaleio__package('sds').with_ensure('present')
+    end
   end
+
   it 'Apply noop IO scheduler for SSD/flash disks' do
     is_expected.to contain_exec('Apply noop IO scheduler for SSD/flash disks').with(
       :command => "bash -c 'for i in `lsblk -d -o ROTA,KNAME | awk \"/^ *0/ {print($2)}\"` ; do if [ -f /sys/block/$i/queue/scheduler ]; then echo noop > /sys/block/$i/queue/scheduler; fi ; done'",
@@ -36,7 +44,7 @@ describe 'scaleio::sds_server' do
 
   context 'when xcache present and ftp configured' do
     it 'installs xcache package' do
-      is_expected.to contain_package('emc-scaleio-xcache').with(
+      is_expected.to contain_scaleio__package('xcache').with(
         :ensure => 'present')
     end
     it 'runs xcache service' do
@@ -57,7 +65,7 @@ describe 'scaleio::sds_server' do
       is_expected.to contain_scaleio__driver_sync('xcache driver sync').with(
         :driver  => 'xcache',
         :ftp     => 'default',
-        :require => 'Package[emc-scaleio-xcache]')
+        :require => 'Scaleio::Package[xcache]')
       is_expected.to contain_notify('FTP to use for xcache driver: ftp://QNzgdxXix:Aw3wFAwAq3@ftp.emc.com, ftp.emc.com, ftp, QNzgdxXix, Aw3wFAwAq3')
     is_expected.to contain_file('Ensure sync directory present: ').with(
       :ensure => 'directory',

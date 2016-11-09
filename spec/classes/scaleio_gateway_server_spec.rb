@@ -43,7 +43,7 @@ describe 'scaleio::gateway_server' do
     end
     it 'installs utilities' do
       is_expected.to contain_package('oracle-java8-installer').with_ensure('installed')
-      is_expected.to contain_package('emc-scaleio-gateway').with_ensure('installed')
+      is_expected.to contain_scaleio__package('gateway').with_ensure('installed')
     end
     it 'sets security bypass' do
       is_expected.to contain_file_line('Set security bypass').with(
@@ -78,7 +78,7 @@ describe 'scaleio::gateway_server' do
           :path    => '/opt/emc/scaleio/gateway/webapps/ROOT/WEB-INF/classes/gatewayUser.properties',
           :match   => '^mdm.ip.addresses=.*',
           :ensure  => 'present',
-          :require => 'Package[emc-scaleio-gateway]',
+          :require => 'Scaleio::Package[gateway]',
           :notify  => 'Service[scaleio-gateway]')
       end
     end
@@ -115,7 +115,7 @@ describe 'scaleio::gateway_server' do
       { :ensure   => 'absent' }
     end
     it 'doesnt contains anything' do
-      is_expected.to contain_package('emc-scaleio-gateway').with_ensure('absent')
+      is_expected.to contain_scaleio__package('gateway').with_ensure('absent')
     end
   end
 end

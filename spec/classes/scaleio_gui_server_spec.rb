@@ -12,7 +12,7 @@ describe 'scaleio::gui_server' do
       { :ensure   => 'absent' }
     end
     it 'removes gui' do
-      is_expected.to contain_package('EMC_ScaleIO_GUI').with_ensure('absent')
+      is_expected.to contain_scaleio__package('gui').with_ensure('absent')
     end
   end
 
@@ -43,7 +43,7 @@ describe 'scaleio::gui_server' do
     end
     it 'installs gui' do
       is_expected.to contain_package('oracle-java8-installer').with_ensure('installed')
-      is_expected.to contain_package('EMC_ScaleIO_GUI').with_ensure('installed')
+      is_expected.to contain_scaleio__package('gui').with_ensure('installed')
     end
   end
 end

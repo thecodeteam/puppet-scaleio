@@ -1,20 +1,17 @@
 # Configure ScaleIO SDC service installation
 
 class scaleio::sdc_server (
-  $ensure               = 'present',  # present|absent - Install or remove SDC service
-  $mdm_ip               = undef,      # string - List of MDM IPs
-  $ftp                  = 'default',  # string - 'default' or FTP with user and password
-  $ensure_properties    = 'present',  # present|absent - Add or remove SDS properties
+  $ensure            = 'present',  # present|absent - Install or remove SDC service
+  $mdm_ip            = undef,      # string - List of MDM IPs
+  $ensure_properties = 'present',  # present|absent - Add or remove SDS properties
+  $drv_src           = 'default',  # string - 'default' or FTP with user and password for driver_sync
+  $pkg_src           = undef,      # string - URL where packages are placed (for example: ftp://ftp.emc.com/Ubuntu/2.0.10000.2072)
   )
 {
-  $sdc_package = $::osfamily ? {
-    'RedHat' => 'EMC-ScaleIO-sdc',
-    'Debian' => 'emc-scaleio-sdc',
-  }
-
   scaleio::common_server { 'install common packages for SDC': } ->
-  package { [$sdc_package]:
-    ensure => $ensure,
+  scaleio::package { 'sdc':
+    ensure  => $ensure,
+    pkg_src => $pkg_src
   }
 
   if $ensure == 'present' {
@@ -22,11 +19,11 @@ class scaleio::sdc_server (
       ensure => 'running',
     }
 
-    if $ftp and $ftp != '' {
+    if $::osfamily == 'Debian' and $drv_src and $drv_src != '' {
       scaleio::driver_sync { 'scini driver sync':
         driver  => 'scini',
-        ftp     => $ftp,
-        require => Package[$sdc_package],
+        ftp     => $drv_src,
+        require => Scaleio::Package['sdc'],
       }
     }
 
@@ -37,7 +34,7 @@ class scaleio::sdc_server (
           line    => "mdm ${mdm_ip}",
           path    => '/bin/emc/scaleio/drv_cfg.txt',
           match   => '^mdm .*',
-          require => Package[$sdc_package],
+          require => Scaleio::Package['sdc'],
           notify  => Service['scini']
         }
       }
@@ -49,7 +46,7 @@ class scaleio::sdc_server (
           path              => '/bin/emc/scaleio/drv_cfg.txt',
           match             => '^mdm .*',
           match_for_absence => true,
-          require           => Package[$sdc_package],
+          require           => Scaleio::Package['sdc'],
           replace           => false,
           notify            => Service['scini']
         }

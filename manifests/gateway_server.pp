@@ -1,25 +1,22 @@
 # Configure ScaleIO Gateway service installation
 
 class scaleio::gateway_server (
-  $ensure       = 'present',  # present|absent - Install or remove Gateway service
-  $mdm_ips      = undef,      # string - List of MDM IPs
-  $password     = undef,      # string - Password for Gateway
-  $port         = 4443,       # int - Port for gateway
-  $im_port      = 8081,       # int - Port for IM
+  $ensure   = 'present',  # present|absent - Install or remove Gateway service
+  $mdm_ips  = undef,      # string - List of MDM IPs
+  $password = undef,      # string - Password for Gateway
+  $port     = 4443,       # int - Port for gateway
+  $im_port  = 8081,       # int - Port for IM
+  $pkg_src  = undef,      # string - URL where packages are placed (for example: ftp://ftp.emc.com/Ubuntu/2.0.10000.2072)
   )
 {
-  $gw_package = $::osfamily ? {
-    'RedHat' => 'EMC-ScaleIO-gateway',
-    'Debian' => 'emc-scaleio-gateway',
-  }
   $provider = "${::osfamily}${::operatingsystemmajrelease}" ? {
     'RedHat6' => 'upstart',
-    default  => undef,
+    default   => undef,
   }
 
   if $ensure == 'absent' {
-    package { $gw_package:
-      ensure => absent,
+    scaleio::package { 'gateway':
+      ensure => absent
     }
   }
   else {
@@ -28,9 +25,12 @@ class scaleio::gateway_server (
       proto  => tcp,
       action => accept,
     }
-    scaleio::common_server { 'install common packages for gateway': ensure_java=>'present' } ->
-    package { $gw_package:
-        ensure  => installed,
+    scaleio::common_server { 'install common packages for gateway':
+      ensure_java=>'present'
+    } ->
+    scaleio::package { 'gateway':
+      ensure  => installed,
+      pkg_src => $pkg_src
     } ->
     service { 'scaleio-gateway':
       ensure   => 'running',
@@ -43,7 +43,7 @@ class scaleio::gateway_server (
       line    => 'security.bypass_certificate_check=true',
       path    => '/opt/emc/scaleio/gateway/webapps/ROOT/WEB-INF/classes/gatewayUser.properties',
       match   => '^security.bypass_certificate_check=',
-      require => Package[$gw_package],
+      require => Scaleio::Package['gateway'],
     } ->
     file_line { 'Set gateway port':
       ensure => present,
@@ -64,7 +64,7 @@ class scaleio::gateway_server (
         line    => "mdm.ip.addresses=${mdm_ips_str}",
         path    => '/opt/emc/scaleio/gateway/webapps/ROOT/WEB-INF/classes/gatewayUser.properties',
         match   => '^mdm.ip.addresses=.*',
-        require => Package[$gw_package],
+        require => Scaleio::Package['gateway'],
       }
     }
     if $password {

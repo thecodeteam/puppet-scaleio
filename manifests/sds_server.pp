@@ -1,19 +1,12 @@
 # Configure ScaleIO SDS and ScaleIO XCache (rfcache) services installation
 
 class scaleio::sds_server (
-  $ensure = 'present',  # present|absent - Install or remove SDS service
-  $xcache = 'present',  # present|absent - Install or remove XCache service
-  $ftp    = 'default',  # string - 'default' or FTP with user and password
+  $ensure  = 'present',  # present|absent - Install or remove SDS service
+  $xcache  = 'present',  # present|absent - Install or remove XCache service
+  $drv_src = 'default',  # string - 'default' or FTP with user and password for driver_sync
+  $pkg_src = undef,      # string - URL where packages are placed (for example: ftp://ftp.emc.com/Ubuntu/2.0.10000.2072)
   )
 {
-  $sds_package = $::osfamily ? {
-    'RedHat' => 'EMC-ScaleIO-sds',
-    'Debian' => 'emc-scaleio-sds',
-  }
-  $xcache_package = $::osfamily ? {
-    'RedHat' => 'EMC-ScaleIO-xcache',
-    'Debian' => 'emc-scaleio-xcache',
-  }
   firewall { '001 Open Port 7072 for ScaleIO SDS':
     dport  => [7072],
     proto  => tcp,
@@ -23,8 +16,9 @@ class scaleio::sds_server (
   $noop_set_cmd = 'if [ -f /sys/block/$i/queue/scheduler ]; then echo noop > /sys/block/$i/queue/scheduler; fi'
 
   scaleio::common_server { 'install common packages for SDS': } ->
-  package { [$sds_package]:
-    ensure => $ensure,
+  scaleio::package { 'sds':
+    ensure  => $ensure,
+    pkg_src => $pkg_src,
   } ->
   exec { 'Apply noop IO scheduler for SSD/flash disks':
     command => "bash -c 'for i in ${noop_devs} ; do ${noop_set_cmd} ; done'",
@@ -35,17 +29,20 @@ class scaleio::sds_server (
     path    => '/etc/udev/rules.d/60-scaleio-ssd-scheduler.rules',
   } ->
 
-  package { [$xcache_package]:
-    ensure => $xcache,
+  scaleio::package { 'xcache':
+    ensure  => $xcache,
+    pkg_src => $pkg_src,
   }
-  if $xcache == 'present' and $ftp and $ftp != '' {
+  if $xcache == 'present' {
     service { 'xcache':
       ensure => 'running',
     }
-    scaleio::driver_sync { 'xcache driver sync':
-      driver  => 'xcache',
-      ftp     => $ftp,
-      require => Package[$xcache_package],
+    if $::osfamily == 'Debian' and $drv_src and $drv_src != '' {
+      scaleio::driver_sync { 'xcache driver sync':
+        driver  => 'xcache',
+        ftp     => $drv_src,
+        require => Scaleio::Package['xcache'],
+      }
     }
   }
 
