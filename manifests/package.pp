@@ -27,7 +27,7 @@ define scaleio::package (
       ensure => absent,
     }
   }
-  else {
+  elsif $pkg_src and $pkg_src != '' {
     $version = $::osfamily ? {
       'RedHat' => "RHEL${::operatingsystemmajrelease}",
       'Debian' => "Ubuntu${::operatingsystemmajrelease}",
