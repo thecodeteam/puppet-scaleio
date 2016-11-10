@@ -29,6 +29,7 @@ class scaleio::sds_server (
     path    => '/etc/udev/rules.d/60-scaleio-ssd-scheduler.rules',
   } ->
 
+  # !!! it must be dependent from common_server. now it does. !!!
   scaleio::package { 'xcache':
     ensure  => $xcache,
     pkg_src => $pkg_src,

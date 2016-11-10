@@ -3,7 +3,7 @@ define scaleio::common_server (
   )
 {
   if $::osfamily == 'RedHat' {
-    package { ['libaio', 'numactl']:
+    package { ['libaio', 'numactl', 'wget']:
       ensure => installed,
     }
     if $ensure_java == 'present' {
@@ -13,7 +13,7 @@ define scaleio::common_server (
     }
   }
   elsif $::osfamily == 'Debian' {
-    package { ['libaio1', 'numactl']:
+    package { ['libaio1', 'numactl', 'wget']:
       ensure => installed,
     }
     if $ensure_java == 'present' {

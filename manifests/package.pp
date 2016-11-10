@@ -46,12 +46,8 @@ define scaleio::package (
     }
     $ftp_url = "${pkg_src}/${version}"
 
-    package { "wget for ${title}":
-      ensure => 'present',
-      name   => 'wget',
-    }
     file { "ensure get_package.sh for ${title}":
-      ensure => $ensure,
+      ensure => present,
       path   => '/root/get_package.sh',
       source => 'puppet:///modules/scaleio/get_package.sh',
       mode   => '0700',
