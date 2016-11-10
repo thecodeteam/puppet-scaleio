@@ -28,9 +28,13 @@ define scaleio::package (
     }
   }
   elsif $pkg_src and $pkg_src != '' {
+    $rel = $::operatingsystemmajrelease ? {
+      '' => $::operatingsystemrelease,
+      default => $::operatingsystemmajrelease
+    }
     $version = $::osfamily ? {
-      'RedHat' => "RHEL${::operatingsystemmajrelease}",
-      'Debian' => "Ubuntu${::operatingsystemmajrelease}",
+      'RedHat' => "RHEL${rel}",
+      'Debian' => "Ubuntu${rel}",
     }
     $provider = $::osfamily ? {
       'RedHat' => 'rpm',
@@ -43,7 +47,8 @@ define scaleio::package (
     $ftp_url = "${pkg_src}/${version}"
 
     package { "wget for ${title}":
-      ensure   => 'present',
+      ensure => 'present',
+      name   => 'wget',
     }
     file { "ensure get_package.sh for ${title}":
       ensure => $ensure,
@@ -59,7 +64,7 @@ define scaleio::package (
     } ->
     package { $package:
       ensure   => $ensure,
-      source   => "/tmp/${title}/package.${pkg_ext}",
+      source   => "/tmp/${title}/${title}.${pkg_ext}",
       provider => $provider,
     }
   }
