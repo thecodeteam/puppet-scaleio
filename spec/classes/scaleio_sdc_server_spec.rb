@@ -4,7 +4,10 @@ describe 'scaleio::sdc_server' do
   let(:facts) {{
     :osfamily => 'Debian'
   }}
-  let (:default_params) {{ :ensure => 'present' }}
+  let (:default_params) {{
+    :ensure => 'present',
+    :pkg_src => 'ftp://ftp',
+  }}
 
   it { is_expected.to contain_class('scaleio::sdc_server')}
 
@@ -18,13 +21,8 @@ describe 'scaleio::sdc_server' do
     is_expected.to contain_package('libaio1').with_ensure('installed')
   end
 
-  context 'with pkg_src' do
-    let (:params) {{
-      :pkg_src => 'ftp://ftp',
-    }}
-    it 'installs emc-scaleio-sdc package' do
-      is_expected.to contain_scaleio__package('sdc').with_ensure('present')
-    end
+  it 'installs emc-scaleio-sdc package' do
+    is_expected.to contain_scaleio__package('sdc').with_ensure('present')
   end
 
   it do

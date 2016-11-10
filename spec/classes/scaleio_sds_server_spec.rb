@@ -4,7 +4,10 @@ describe 'scaleio::sds_server' do
   let(:facts) {{
     :osfamily => 'Debian'
   }}
-  let (:default_params) {{ :ensure => 'present' }}
+  let (:default_params) {{
+    :ensure => 'present',
+    :pkg_src => 'ftp://ftp',
+  }}
 
   it { is_expected.to contain_class('scaleio::sds_server') }
 
@@ -22,14 +25,9 @@ describe 'scaleio::sds_server' do
     is_expected.to contain_scaleio__common_server('install common packages for SDS')
   end
 
-  context 'with pkg_src' do
-    let (:params) {{
-      :pkg_src => 'ftp://ftp',
-    }}
     it 'installs sds package' do
       is_expected.to contain_scaleio__package('sds').with_ensure('present')
     end
-  end
 
   it 'Apply noop IO scheduler for SSD/flash disks' do
     is_expected.to contain_exec('Apply noop IO scheduler for SSD/flash disks').with(

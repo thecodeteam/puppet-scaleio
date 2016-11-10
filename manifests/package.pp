@@ -48,14 +48,14 @@ define scaleio::package (
 
     file { "ensure get_package.sh for ${title}":
       ensure => present,
-      path   => '/root/get_package.sh',
+      path   => "/root/get_package_${title}.sh",
       source => 'puppet:///modules/scaleio/get_package.sh',
       mode   => '0700',
       owner  => 'root',
       group  => 'root',
     } ->
     exec { "get_package ${title}":
-      command => "/root/get_package.sh ${ftp_url} ${title}",
+      command => "/root/get_package_${title}.sh ${ftp_url} ${title}",
       path    => '/bin:/usr/bin',
     } ->
     package { $package:
