@@ -41,9 +41,14 @@ describe 'scaleio::gui_server' do
       is_expected.to contain_exec('java license accepting step 2').with(
         :command     => 'echo debconf shared/accepted-oracle-license-v1-1 seen true | debconf-set-selections')
     end
-    it 'installs gui' do
-      is_expected.to contain_package('oracle-java8-installer').with_ensure('installed')
-      is_expected.to contain_scaleio__package('gui').with_ensure('installed')
+    context 'with pkg_src' do
+      let (:params) {{
+        :pkg_src => 'ftp://ftp',
+      }}
+      it 'installs gui' do
+        is_expected.to contain_package('oracle-java8-installer').with_ensure('installed')
+        is_expected.to contain_scaleio__package('gui').with_ensure('installed')
+      end
     end
   end
 end

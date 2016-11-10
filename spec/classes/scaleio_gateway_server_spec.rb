@@ -43,7 +43,14 @@ describe 'scaleio::gateway_server' do
     end
     it 'installs utilities' do
       is_expected.to contain_package('oracle-java8-installer').with_ensure('installed')
-      is_expected.to contain_scaleio__package('gateway').with_ensure('installed')
+    end
+    context 'with pkg_src' do
+      let (:params) {{
+        :pkg_src => 'ftp://ftp',
+      }}
+      it 'installs gateway' do
+        is_expected.to contain_scaleio__package('gateway').with_ensure('installed')
+      end
     end
     it 'sets security bypass' do
       is_expected.to contain_file_line('Set security bypass').with(
@@ -86,7 +93,7 @@ describe 'scaleio::gateway_server' do
       let :params do
         {:mdm_ips => ''}
       end
-      it 'doesnot connect to mdm' do
+      it 'does not connect to mdm' do
         should_not contain_file_line('Set MDM IP addresses')
       end
     end
@@ -110,6 +117,7 @@ describe 'scaleio::gateway_server' do
       end
     end
   end
+
   context 'ensure is absent' do
     let :params do
       { :ensure   => 'absent' }
