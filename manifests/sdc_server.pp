@@ -19,7 +19,7 @@ class scaleio::sdc_server (
       ensure => 'running',
     }
 
-    if $::osfamily == 'Debian' and $ftp and $ftp != '' {
+    if $ftp and $ftp != '' {
       scaleio::driver_sync { 'scini driver sync':
         driver  => 'scini',
         ftp     => $ftp,

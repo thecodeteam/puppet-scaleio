@@ -38,7 +38,7 @@ class scaleio::sds_server (
     service { 'xcache':
       ensure => 'running',
     }
-    if $::osfamily == 'Debian' and $ftp and $ftp != '' {
+    if $ftp and $ftp != '' {
       scaleio::driver_sync { 'xcache driver sync':
         driver  => 'xcache',
         ftp     => $ftp,
