@@ -3,7 +3,7 @@
 class scaleio::sds_server (
   $ensure  = 'present',  # present|absent - Install or remove SDS service
   $xcache  = 'present',  # present|absent - Install or remove XCache service
-  $drv_src = 'default',  # string - 'default' or FTP with user and password for driver_sync
+  $ftp     = 'default',  # string - 'default' or FTP with user and password for driver_sync
   $pkg_src = undef,      # string - URL where packages are placed (for example: ftp://ftp.emc.com/Ubuntu/2.0.10000.2072)
   )
 {
@@ -38,10 +38,10 @@ class scaleio::sds_server (
     service { 'xcache':
       ensure => 'running',
     }
-    if $::osfamily == 'Debian' and $drv_src and $drv_src != '' {
+    if $::osfamily == 'Debian' and $ftp and $ftp != '' {
       scaleio::driver_sync { 'xcache driver sync':
         driver  => 'xcache',
-        ftp     => $drv_src,
+        ftp     => $ftp,
         require => Scaleio::Package['xcache'],
       }
     }

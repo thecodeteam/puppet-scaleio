@@ -149,7 +149,7 @@ describe 'scaleio::sdc_server' do
 
   context 'with ftp' do
     let (:params) {{
-        :drv_src => 'ftp://ftp'}}
+        :ftp => 'ftp://ftp'}}
     it do
       is_expected.to contain_scaleio__driver_sync('scini driver sync').with(
         :driver  => 'scini',
@@ -160,7 +160,7 @@ describe 'scaleio::sdc_server' do
   end
   context 'without ftp' do
     let (:params) {{
-        :drv_src => ''}}
+        :ftp => ''}}
     it do
       is_expected.not_to contain_scaleio__driver_sync('scini driver sync')
     end
