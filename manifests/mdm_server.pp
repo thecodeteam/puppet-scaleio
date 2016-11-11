@@ -6,7 +6,7 @@ class scaleio::mdm_server (
   $master_mdm_name    = undef,      # string - Name of the master node
   $mdm_ips            = undef,      # string - MDM IPs
   $mdm_management_ips = undef,      # string - MDM management IPs
-  $pkg_src            = undef,      # string - URL where packages are placed (for example: ftp://ftp.emc.com/Ubuntu/2.0.10000.2072)
+  $pkg_ftp            = undef,      # string - URL where packages are placed (for example: ftp://ftp.emc.com/Ubuntu/2.0.10000.2072)
   )
 {
   $provider = "${::osfamily}${::operatingsystemmajrelease}" ? {
@@ -31,7 +31,7 @@ class scaleio::mdm_server (
     } ->
     scaleio::package { 'mdm':
       ensure  => $ensure,
-      pkg_src => $pkg_src,
+      pkg_ftp => $pkg_ftp,
     }
     service { 'mdm':
       ensure    => 'running',

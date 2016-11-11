@@ -2,7 +2,7 @@
 
 class scaleio::gui_server (
   $ensure  = 'present',  # present|absent - Install or remove GUI
-  $pkg_src = undef,      # string - URL where packages are placed (for example: ftp://ftp.emc.com/Ubuntu/2.0.10000.2072)
+  $pkg_ftp = undef,      # string - URL where packages are placed (for example: ftp://ftp.emc.com/Ubuntu/2.0.10000.2072)
 )
 {
   if $ensure == 'absent' {
@@ -14,7 +14,7 @@ class scaleio::gui_server (
     scaleio::common_server { 'install common packages for GUI': ensure_java=>'present' } ->
     scaleio::package { 'gui':
       ensure  => installed,
-      pkg_src => $pkg_src,
+      pkg_ftp => $pkg_ftp,
     }
   }
 

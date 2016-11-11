@@ -6,7 +6,7 @@ class scaleio::gateway_server (
   $password = undef,      # string - Password for Gateway
   $port     = 4443,       # int - Port for gateway
   $im_port  = 8081,       # int - Port for IM
-  $pkg_src  = undef,      # string - URL where packages are placed (for example: ftp://ftp.emc.com/Ubuntu/2.0.10000.2072)
+  $pkg_ftp  = undef,      # string - URL where packages are placed (for example: ftp://ftp.emc.com/Ubuntu/2.0.10000.2072)
   )
 {
   $provider = "${::osfamily}${::operatingsystemmajrelease}" ? {
@@ -30,7 +30,7 @@ class scaleio::gateway_server (
     } ->
     scaleio::package { 'gateway':
       ensure  => installed,
-      pkg_src => $pkg_src
+      pkg_ftp => $pkg_ftp
     } ->
     service { 'scaleio-gateway':
       ensure   => 'running',

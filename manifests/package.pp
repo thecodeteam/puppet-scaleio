@@ -1,6 +1,6 @@
 define scaleio::package (
   $ensure = undef,
-  $pkg_src = undef,
+  $pkg_ftp = undef,
   )
 {
   $package = $::osfamily ? {
@@ -27,7 +27,7 @@ define scaleio::package (
       ensure => absent,
     }
   }
-  elsif $pkg_src and $pkg_src != '' {
+  elsif $pkg_ftp and $pkg_ftp != '' {
     $rel = $::operatingsystemmajrelease ? {
       '' => $::operatingsystemrelease,
       default => $::operatingsystemmajrelease
@@ -44,7 +44,7 @@ define scaleio::package (
       'RedHat' => 'rpm',
       'Debian' => 'deb',
     }
-    $ftp_url = "${pkg_src}/${version}"
+    $ftp_url = "${pkg_ftp}/${version}"
 
     file { "ensure get_package.sh for ${title}":
       ensure => present,

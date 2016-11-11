@@ -44,9 +44,9 @@ describe 'scaleio::gateway_server' do
     it 'installs utilities' do
       is_expected.to contain_package('oracle-java8-installer').with_ensure('installed')
     end
-    context 'with pkg_src' do
+    context 'with pkg_ftp' do
       let (:params) {{
-        :pkg_src => 'ftp://ftp',
+        :pkg_ftp => 'ftp://ftp',
       }}
       it 'installs gateway' do
         is_expected.to contain_scaleio__package('gateway').with_ensure('installed')

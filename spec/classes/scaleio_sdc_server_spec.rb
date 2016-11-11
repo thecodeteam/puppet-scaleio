@@ -6,7 +6,7 @@ describe 'scaleio::sdc_server' do
   }}
   let (:default_params) {{
     :ensure => 'present',
-    :pkg_src => 'ftp://ftp',
+    :pkg_ftp => 'ftp://ftp',
   }}
 
   it { is_expected.to contain_class('scaleio::sdc_server')}

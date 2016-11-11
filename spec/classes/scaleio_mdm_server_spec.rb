@@ -27,9 +27,9 @@ describe 'scaleio::mdm_server' do
       is_expected.to contain_package('python-paramiko').with_ensure('installed')
     end
 
-    context 'with pkg_src' do
+    context 'with pkg_ftp' do
       let (:params) {{
-        :pkg_src => 'ftp://ftp',
+        :pkg_ftp => 'ftp://ftp',
       }}
       it 'installs mdm package' do
         is_expected.to contain_scaleio__package('mdm').with_ensure('present')

@@ -5,13 +5,13 @@ class scaleio::sdc_server (
   $mdm_ip            = undef,      # string - List of MDM IPs
   $ensure_properties = 'present',  # present|absent - Add or remove SDS properties
   $ftp               = 'default',  # string - 'default' or FTP with user and password for driver_sync
-  $pkg_src           = undef,      # string - URL where packages are placed (for example: ftp://ftp.emc.com/Ubuntu/2.0.10000.2072)
+  $pkg_ftp           = undef,      # string - URL where packages are placed (for example: ftp://ftp.emc.com/Ubuntu/2.0.10000.2072)
   )
 {
   scaleio::common_server { 'install common packages for SDC': } ->
   scaleio::package { 'sdc':
     ensure  => $ensure,
-    pkg_src => $pkg_src
+    pkg_ftp => $pkg_ftp
   }
 
   if $ensure == 'present' {

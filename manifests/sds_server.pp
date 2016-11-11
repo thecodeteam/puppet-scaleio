@@ -4,7 +4,7 @@ class scaleio::sds_server (
   $ensure  = 'present',  # present|absent - Install or remove SDS service
   $xcache  = 'present',  # present|absent - Install or remove XCache service
   $ftp     = 'default',  # string - 'default' or FTP with user and password for driver_sync
-  $pkg_src = undef,      # string - URL where packages are placed (for example: ftp://ftp.emc.com/Ubuntu/2.0.10000.2072)
+  $pkg_ftp = undef,      # string - URL where packages are placed (for example: ftp://ftp.emc.com/Ubuntu/2.0.10000.2072)
   )
 {
   firewall { '001 Open Port 7072 for ScaleIO SDS':
@@ -18,7 +18,7 @@ class scaleio::sds_server (
   scaleio::common_server { 'install common packages for SDS': } ->
   scaleio::package { 'sds':
     ensure  => $ensure,
-    pkg_src => $pkg_src,
+    pkg_ftp => $pkg_ftp,
   } ->
   exec { 'Apply noop IO scheduler for SSD/flash disks':
     command => "bash -c 'for i in ${noop_devs} ; do ${noop_set_cmd} ; done'",
@@ -32,7 +32,7 @@ class scaleio::sds_server (
   # !!! it must be dependent from common_server. now it does. !!!
   scaleio::package { 'xcache':
     ensure  => $xcache,
-    pkg_src => $pkg_src,
+    pkg_ftp => $pkg_ftp,
   }
   if $xcache == 'present' {
     service { 'xcache':
