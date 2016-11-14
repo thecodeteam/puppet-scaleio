@@ -23,7 +23,7 @@ define scaleio::driver_sync(
     repo_user           => $ftp_creds[0],
     repo_password       => $ftp_creds[1],
     local_dir           => "/bin/emc/scaleio/${driver}_sync/driver_cache/",
-    module_sigcheck     => 1,
+    module_sigcheck     => 0,
     emc_public_gpg_key  => "/bin/emc/scaleio/${driver}_sync/RPM-GPG-KEY-ScaleIO",
     repo_public_rsa_key => "/bin/emc/scaleio/${driver}_sync/${driver}_repo_key.pub",
     sync_pattern        => '.*',
