@@ -3,20 +3,14 @@ define scaleio::common_server (
   )
 {
   if $::osfamily == 'RedHat' {
-    package { ['libaio', 'numactl', 'wget']:
-      ensure => installed,
-    }
+    ensure_resource('package', ['libaio', 'numactl', 'wget'], {'ensure' => 'installed'})
     if $ensure_java == 'present' {
-      package { 'java-1.8.0-openjdk':
-        ensure  => installed,
-      }
+      ensure_resource('package', 'java-1.8.0-openjdk', {'ensure' => 'installed'})
     }
   }
   elsif $::osfamily == 'Debian' {
-    package { ['libaio1', 'numactl', 'wget']:
-      ensure => installed,
-    }
-    if $ensure_java == 'present' {
+    ensure_resource('package', ['libaio1', 'numactl', 'wget'], {'ensure' => 'installed'})
+    if $ensure_java == 'present' and ! defined(Exec['add java8 repo']) {
       Exec { path => [ '/bin/', '/sbin/' , '/usr/bin/', '/usr/sbin/' ] }
       # Below are a java 1.8 installation steps which shouldn't be required for newer Ubuntu versions
       exec { 'add java8 repo':

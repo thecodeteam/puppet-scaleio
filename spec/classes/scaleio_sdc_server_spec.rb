@@ -49,7 +49,7 @@ describe 'scaleio::sdc_server' do
       "repo_user"           => 'QNzgdxXix',
       "repo_password"       => 'Aw3wFAwAq3',
       "local_dir"           => '/bin/emc/scaleio/scini_sync/driver_cache/',
-      "module_sigcheck"     => 1,
+      "module_sigcheck"     => 0,
       "emc_public_gpg_key"  => '/bin/emc/scaleio/scini_sync/RPM-GPG-KEY-ScaleIO',
       "repo_public_rsa_key" => '/bin/emc/scaleio/scini_sync/scini_repo_key.pub',
       "sync_pattern"        => '.*',

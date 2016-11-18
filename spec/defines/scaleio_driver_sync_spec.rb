@@ -30,7 +30,7 @@ describe 'scaleio::driver_sync' do
       "repo_user"           => 'QNzgdxXix',
       "repo_password"       => 'Aw3wFAwAq3',
       "local_dir"           => '/bin/emc/scaleio/scini_sync/driver_cache/',
-      "module_sigcheck"     => 1,
+      "module_sigcheck"     => 0,
       "emc_public_gpg_key"  => '/bin/emc/scaleio/scini_sync/RPM-GPG-KEY-ScaleIO',
       "repo_public_rsa_key" => '/bin/emc/scaleio/scini_sync/scini_repo_key.pub',
       "sync_pattern"        => '.*',
@@ -59,7 +59,7 @@ describe 'scaleio::driver_sync' do
     :ensure => 'present',
     :path   => '/bin/emc/scaleio/scini_sync/driver_sync.conf',
     :match  => '^module_sigcheck',
-    :line   => 'module_sigcheck=1')}
+    :line   => 'module_sigcheck=0')}
   it { is_expected.to contain_config_sync('repo_address').with(
     :driver => 'scini',
     :config => sync_conf)}
