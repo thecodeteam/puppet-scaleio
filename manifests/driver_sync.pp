@@ -23,7 +23,7 @@ define scaleio::driver_sync(
     repo_user           => $ftp_creds[0],
     repo_password       => $ftp_creds[1],
     local_dir           => "/bin/emc/scaleio/${driver}_sync/driver_cache/",
-    module_sigcheck     => 0,
+    module_sigcheck     => 1,
     emc_public_gpg_key  => "/bin/emc/scaleio/${driver}_sync/RPM-GPG-KEY-ScaleIO",
     repo_public_rsa_key => "/bin/emc/scaleio/${driver}_sync/${driver}_repo_key.pub",
     sync_pattern        => '.*',
@@ -35,6 +35,19 @@ define scaleio::driver_sync(
     path   => "/bin/emc/scaleio/${driver}_sync",
     mode   => '0755',
   } ->
+  # import old keys for old kernels manually
+  file { "/bin/emc/scaleio/${driver}_sync/RPM-GPG-KEY-ScaleIO.1":
+    ensure => present,
+    source => 'puppet:///modules/scaleio/RPM-GPG-KEY-ScaleIO.1',
+    mode   => '0644',
+    owner  => 'root',
+    group  => 'root',
+  } ->
+  exec { "scaleio ${driver} old key #1":
+    command => "gpg --immport /bin/emc/scaleio/${driver}_sync/RPM-GPG-KEY-ScaleIO.1",
+    path    => ['/bin/', '/usr/bin', '/sbin'],
+  } ->
+  # then run driver_sync
   file { "/bin/emc/scaleio/${driver}_sync/RPM-GPG-KEY-ScaleIO":
     ensure => present,
     source => 'puppet:///modules/scaleio/RPM-GPG-KEY-ScaleIO',
