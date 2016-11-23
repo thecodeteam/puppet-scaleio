@@ -44,7 +44,7 @@ define scaleio::driver_sync(
     group  => 'root',
   } ->
   exec { "scaleio ${driver} old key #1":
-    command => "gpg --immport /bin/emc/scaleio/${driver}_sync/RPM-GPG-KEY-ScaleIO.1",
+    command => "gpg --import /bin/emc/scaleio/${driver}_sync/RPM-GPG-KEY-ScaleIO.1",
     path    => ['/bin/', '/usr/bin', '/sbin'],
   } ->
   # then run driver_sync
