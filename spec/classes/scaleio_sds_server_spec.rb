@@ -54,7 +54,7 @@ describe 'scaleio::sds_server' do
       "repo_user"           => 'QNzgdxXix',
       "repo_password"       => 'Aw3wFAwAq3',
       "local_dir"           => '/bin/emc/scaleio/xcache_sync/driver_cache/',
-      "module_sigcheck"     => 0,
+      "module_sigcheck"     => 1,
       "emc_public_gpg_key"  => '/bin/emc/scaleio/xcache_sync/RPM-GPG-KEY-ScaleIO',
       "repo_public_rsa_key" => '/bin/emc/scaleio/xcache_sync/xcache_repo_key.pub',
       "sync_pattern"        => '.*'})
@@ -113,7 +113,7 @@ describe 'scaleio::sds_server' do
       :ensure => 'present',
       :path   => '/bin/emc/scaleio/xcache_sync/driver_sync.conf',
       :match  => '^module_sigcheck',
-      :line   => 'module_sigcheck=0')
+      :line   => 'module_sigcheck=1')
     is_expected.to contain_config_sync('repo_address').with(
       :driver => 'xcache',
       :config => sync_conf)
