@@ -1,5 +1,5 @@
 name    'cloudscaling-scaleio'
-version '1.1.1'
+version '1.1.5'
 source 'https://github.com/emccode/puppet-scaleio'
 author 'cloudscaling'
 license 'Apache License, Version 2.0'
