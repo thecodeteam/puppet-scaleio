@@ -20,6 +20,7 @@ describe 'scaleio::sds_server' do
   it 'ensures utilities' do
     is_expected.to contain_package('numactl').with_ensure('installed')
     is_expected.to contain_package('libaio1').with_ensure('installed')
+    is_expected.to contain_package('wget').with_ensure('installed')
   end
   it 'installs common packages for SDS' do
     is_expected.to contain_scaleio__common_server('install common packages for SDS')
