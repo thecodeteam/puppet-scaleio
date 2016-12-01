@@ -28,6 +28,7 @@ describe 'scaleio::gateway_server' do
     it 'installs utilities' do
       is_expected.to contain_package('numactl').with_ensure('installed')
       is_expected.to contain_package('libaio1').with_ensure('installed')
+      is_expected.to contain_package('wget').with_ensure('installed')
     end
     it 'runs java8 repo' do
       is_expected.to contain_exec('add java8 repo').with(
@@ -50,6 +51,20 @@ describe 'scaleio::gateway_server' do
       }}
       it 'installs gateway' do
         is_expected.to contain_scaleio__package('gateway').with_ensure('installed')
+        is_expected.to contain_file('ensure get_package.sh for gateway').with(
+          :ensure => 'present',
+          :path   => '/root/get_package_gateway.sh',
+          :source => 'puppet:///modules/scaleio/get_package.sh',
+          :mode   => '0700',
+          :owner  => 'root',
+          :group  => 'root')
+        is_expected.to contain_exec('get_package gateway').with(
+          :command => '/root/get_package_gateway.sh ftp://ftp/Ubuntu gateway',
+          :path    => '/bin:/usr/bin')
+        is_expected.to contain_package('emc-scaleio-gateway').with(
+          :ensure   => 'installed',
+          :source   => '/tmp/gateway/gateway.deb',
+          :provider => 'dpkg')
       end
     end
     it 'sets security bypass' do

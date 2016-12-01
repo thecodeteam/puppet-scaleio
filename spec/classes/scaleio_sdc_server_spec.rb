@@ -20,6 +20,9 @@ describe 'scaleio::sdc_server' do
   it 'installs libaio1 package' do
     is_expected.to contain_package('libaio1').with_ensure('installed')
   end
+  it 'installs wget package' do
+    is_expected.to contain_package('wget').with_ensure('installed')
+  end
 
   it 'installs emc-scaleio-sdc package' do
     is_expected.to contain_scaleio__package('sdc').with_ensure('present')

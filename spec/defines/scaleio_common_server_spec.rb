@@ -13,6 +13,8 @@ describe 'scaleio::common_server' do
       :ensure => 'installed')}
     it { is_expected.to contain_package('numactl').with(
       :ensure => 'installed')}
+    it { is_expected.to contain_package('wget').with(
+      :ensure => 'installed')}
 
     context 'when ensure_java is present' do
     let (:params) {{ :ensure_java => 'present' }}
@@ -28,6 +30,8 @@ describe 'scaleio::common_server' do
     it { is_expected.to contain_package('libaio1').with(
       :ensure => 'installed')}
     it { is_expected.to contain_package('numactl').with(
+      :ensure => 'installed')}
+    it { is_expected.to contain_package('wget').with(
       :ensure => 'installed')}
 
     context 'when ensure_java is present' do

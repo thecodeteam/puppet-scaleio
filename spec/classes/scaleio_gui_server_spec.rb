@@ -28,6 +28,7 @@ describe 'scaleio::gui_server' do
     it 'installs utilities' do
       is_expected.to contain_package('numactl').with_ensure('installed')
       is_expected.to contain_package('libaio1').with_ensure('installed')
+      is_expected.to contain_package('wget').with_ensure('installed')
     end
     it 'runs java8 repo' do
       is_expected.to contain_exec('add java8 repo').with(
@@ -48,6 +49,20 @@ describe 'scaleio::gui_server' do
       it 'installs gui' do
         is_expected.to contain_package('oracle-java8-installer').with_ensure('installed')
         is_expected.to contain_scaleio__package('gui').with_ensure('installed')
+        is_expected.to contain_file('ensure get_package.sh for gui').with(
+          :ensure => 'present',
+          :path   => '/root/get_package_gui.sh',
+          :source => 'puppet:///modules/scaleio/get_package.sh',
+          :mode   => '0700',
+          :owner  => 'root',
+          :group  => 'root')
+        is_expected.to contain_exec('get_package gui').with(
+          :command => '/root/get_package_gui.sh ftp://ftp/Ubuntu gui',
+          :path    => '/bin:/usr/bin')
+        is_expected.to contain_package('EMC_ScaleIO_GUI').with(
+          :ensure   => 'installed',
+          :source   => '/tmp/gui/gui.deb',
+          :provider => 'dpkg')
       end
     end
   end

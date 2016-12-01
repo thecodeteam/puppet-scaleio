@@ -22,6 +22,7 @@ describe 'scaleio::mdm_server' do
     it 'has utilities installed' do
       is_expected.to contain_package('numactl').with_ensure('installed')
       is_expected.to contain_package('libaio1').with_ensure('installed')
+      is_expected.to contain_package('wget').with_ensure('installed')
       is_expected.to contain_package('mutt').with_ensure('installed')
       is_expected.to contain_package('python').with_ensure('installed')
       is_expected.to contain_package('python-paramiko').with_ensure('installed')
@@ -33,6 +34,20 @@ describe 'scaleio::mdm_server' do
       }}
       it 'installs mdm package' do
         is_expected.to contain_scaleio__package('mdm').with_ensure('present')
+      is_expected.to contain_file('ensure get_package.sh for mdm').with(
+        :ensure => 'present',
+        :path   => '/root/get_package_mdm.sh',
+        :source => 'puppet:///modules/scaleio/get_package.sh',
+        :mode   => '0700',
+        :owner  => 'root',
+        :group  => 'root')
+      is_expected.to contain_exec('get_package mdm').with(
+        :command => '/root/get_package_mdm.sh ftp://ftp/Ubuntu mdm',
+        :path    => '/bin:/usr/bin')
+      is_expected.to contain_package('emc-scaleio-mdm').with(
+        :ensure   => 'present',
+        :source   => '/tmp/mdm/mdm.deb',
+        :provider => 'dpkg')
       end
     end
     it 'runs mdm service' do
