@@ -70,6 +70,15 @@ describe 'scaleio::sds_server' do
       :ensure => 'directory',
       :path   => '/bin/emc/scaleio/xcache_sync',
       :mode   => '0755')
+    is_expected.to contain_file('/bin/emc/scaleio/xcache_sync/RPM-GPG-KEY-ScaleIO.1').with(
+      :ensure => 'present',
+      :source => 'puppet:///modules/scaleio/RPM-GPG-KEY-ScaleIO.1',
+      :mode   => '0644',
+      :owner  => 'root',
+      :group  => 'root')
+    is_expected.to contain_exec('scaleio xcache old key #1').with(
+      :command => 'gpg --import /bin/emc/scaleio/xcache_sync/RPM-GPG-KEY-ScaleIO.1',
+      :path    => ['/bin/', '/usr/bin', '/sbin'])
     is_expected.to contain_file('/bin/emc/scaleio/xcache_sync/RPM-GPG-KEY-ScaleIO').with(
       :ensure => 'present',
       :source => 'puppet:///modules/scaleio/RPM-GPG-KEY-ScaleIO',

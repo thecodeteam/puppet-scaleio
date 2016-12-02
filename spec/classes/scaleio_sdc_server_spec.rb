@@ -99,6 +99,17 @@ describe 'scaleio::sdc_server' do
       :path   => '/bin/emc/scaleio/scini_sync',
       :mode   => '0755')
   end
+  it 'imports old keys for old kernels manually' do
+    is_expected.to contain_file('/bin/emc/scaleio/scini_sync/RPM-GPG-KEY-ScaleIO.1').with(
+      :ensure => 'present',
+      :source => 'puppet:///modules/scaleio/RPM-GPG-KEY-ScaleIO.1',
+      :mode   => '0644',
+      :owner  => 'root',
+      :group  => 'root')
+    is_expected.to contain_exec('scaleio scini old key #1').with(
+      :command => 'gpg --import /bin/emc/scaleio/scini_sync/RPM-GPG-KEY-ScaleIO.1',
+      :path    => ['/bin/', '/usr/bin', '/sbin'])
+  end
 
   context 'with mdm_ip and ensure properties' do
     let (:params) {{

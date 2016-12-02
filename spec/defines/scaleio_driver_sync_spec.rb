@@ -1,4 +1,4 @@
-require 'spec_helper'
+    require 'spec_helper'
 
 describe 'scaleio::driver_sync' do
 
@@ -12,6 +12,17 @@ describe 'scaleio::driver_sync' do
     :ensure => 'directory',
     :path   => '/bin/emc/scaleio/scini_sync',
     :mode   => '0755')}
+  it 'imports old keys for old kernels manually' do
+    is_expected.to contain_file('/bin/emc/scaleio/scini_sync/RPM-GPG-KEY-ScaleIO.1').with(
+      :ensure => 'present',
+      :source => 'puppet:///modules/scaleio/RPM-GPG-KEY-ScaleIO.1',
+      :mode   => '0644',
+      :owner  => 'root',
+      :group  => 'root')
+    is_expected.to contain_exec('scaleio scini old key #1').with(
+      :command => 'gpg --import /bin/emc/scaleio/scini_sync/RPM-GPG-KEY-ScaleIO.1',
+      :path    => ['/bin/', '/usr/bin', '/sbin'])
+  end
   it { is_expected.to contain_file('/bin/emc/scaleio/scini_sync/RPM-GPG-KEY-ScaleIO').with(
     :ensure => 'present',
     :source => 'puppet:///modules/scaleio/RPM-GPG-KEY-ScaleIO',
