@@ -2,7 +2,7 @@
 
 ## Overview
 
-A Puppet module that installs and configures the ScaleIO 2.0 block storage service components.  The module currently supports Ubuntu 14.04 and CentOS 6 and 7.
+A Puppet module that installs and configures the ScaleIO 2.0 block storage service components.  The module currently supports Ubuntu 14.04/16.04 and CentOS 6 and 7.
 
 ## Module Description
 
@@ -21,8 +21,8 @@ Most aspects of configuration of ScaleIO have been brought into Puppet.
 ### Tested with
 
 * Puppet 3.*, 4.*
-* ScaleIO 2.0
-* Ubuntu 14.04, CentOS 6, CentOS 7
+* ScaleIO 2.0+
+* Ubuntu 14.04/16.04, CentOS 6, CentOS 7
 
 ### Setup Requirements
 
