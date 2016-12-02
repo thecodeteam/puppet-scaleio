@@ -4,9 +4,9 @@
   "summary": "Puppet library for Scaleio 2.0 deployment and configuration",
   "version": "1.2.0",
   "license": "Apache License, Version 2.0",
-  "source": "https://github.com/emccode/puppet-scaleio",
-  "project_page": "https://github.com/emccode/puppet-scaleio",
-  "issues_url": "https://github.com/emccode/puppet-scaleio/issues",
+  "source": "https://github.com/codedellemc/puppet-scaleio",
+  "project_page": "https://github.com/codedellemc/puppet-scaleio",
+  "issues_url": "https://github.com/codedellemc/puppet-scaleio/issues",
   "dependencies": [
     {"name":"puppetlabs-firewall","version_requirement":">= 1.1.3"},
     {"name":"puppetlabs-stdlib","version_requirement":">= 4.3.2"}

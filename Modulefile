@@ -1,11 +1,11 @@
 name    'cloudscaling-scaleio'
 version '1.2.0'
-source 'https://github.com/emccode/puppet-scaleio'
+source 'https://github.com/codedellemc/puppet-scaleio'
 author 'cloudscaling'
 license 'Apache License, Version 2.0'
 summary 'Puppet library for Scaleio 2.0 deployment and configuration'
 description 'UNKNOWN'
-project_page 'https://github.com/emccode/puppet-scaleio'
+project_page 'https://github.com/codedellemc/puppet-scaleio'
 
 ## Add dependencies, if any:
 # dependency 'username/name', '>= 1.2.0'

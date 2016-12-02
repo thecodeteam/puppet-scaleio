@@ -176,4 +176,4 @@ No InstallationManager support is provided. Provisioning of LIA and CallHome is 
 
 ## Contact information
 
-- [Project Bug Tracker](https://github.com/emccode/puppet-scaleio/issues)
+- [Project Bug Tracker](https://github.com/codedellemc/puppet-scaleio/issues)
