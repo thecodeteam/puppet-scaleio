@@ -12,14 +12,15 @@ require "%s/scaleio/transport" % [puppet_dir]
   opt :server, "ScaleIO gateway", :type => :string, :required => true
   opt :port, "ScaleIO gateway port", :default => 443
   opt :username, "ScaleIO gateway username", :type => :string, :required => true
-  opt :password, "ScaleIO gateway password", :type => :string, :default => ENV["PASSWORD"], :required => true
+  opt :password, "ScaleIO gateway password", :type => :string, :default => ENV["PASSWORD"]
   opt :timeout, "ScaleIO gateway connection timeout", :type => :integer, :default => 300, :required => false
+  opt :credential_id, 'dummy value for ASM, not used'
   opt :output, "Location of the file where facts file needs to be created", :type => :string, :required => false
 end
 
 def collect_scaleio_facts
   facts = {}
-  facts[:scaleio_systems] = scaleio_systems
+  facts[:facts] = scaleio_systems
   scaleio_systems.each do |scaleio_system|
     facts[scaleio_system["id"]] = {:statistics => {}, :sds => [], :sdc => [], :protection_domains => []}
     facts[scaleio_system["id"]][:statistics] = scaleio_system_statistics(scaleio_system)
