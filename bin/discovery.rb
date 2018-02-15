@@ -21,7 +21,8 @@ def collect_scaleio_facts
   facts = {}
   facts[:scaleio_systems] = scaleio_systems
   scaleio_systems.each do |scaleio_system|
-    facts[scaleio_system["id"]] = {:sds => [], :sdc => [], :protection_domains => []}
+    facts[scaleio_system["id"]] = {:statistics => {}, :sds => [], :sdc => [], :protection_domains => []}
+    facts[scaleio_system["id"]][:statistics] = scaleio_system_statistics(scaleio_system)
     facts[scaleio_system["id"]][:sds] = scaleio_sds(scaleio_system)
     facts[scaleio_system["id"]][:sdc] = scaleio_sdc(scaleio_system)
     facts[scaleio_system["id"]][:protection_domains] = protection_domains(scaleio_system)
@@ -29,9 +30,11 @@ def collect_scaleio_facts
     facts[scaleio_system["id"]][:fault_sets] = scaleio_faultsets(scaleio_system)
     facts[scaleio_system["id"]][:protection_domains].each do |protection_domain|
       facts[scaleio_system["id"]][protection_domain["id"]] ||= {}
+      facts[scaleio_system["id"]][protection_domain["id"]][:statistics] = scaleio_protection_domain_statistics(protection_domain)
       facts[scaleio_system["id"]][protection_domain["id"]][:storage_pools] = storage_pools(scaleio_system, protection_domain)
       facts[scaleio_system["id"]][protection_domain["id"]][:storage_pools].each do |storage_pool|
         facts[scaleio_system["id"]][protection_domain["id"]][storage_pool["id"]] ||= {}
+        facts[scaleio_system["id"]][protection_domain["id"]][storage_pool["id"]][:statistics] = scaleio_storage_pool_statistics(storage_pool)
         facts[scaleio_system["id"]][protection_domain["id"]][storage_pool["id"]][:disks] = disks(storage_pool)
       end
     end
@@ -41,6 +44,12 @@ end
 
 def scaleio_systems
   url = transport.get_url("/api/types/System/instances")
+  transport.post_request(url, {}, "get") || []
+end
+
+def scaleio_system_statistics(scaleio_system)
+  end_point = "/api/instances/System::%s/relationships/Statistics" % [scaleio_system["id"]]
+  url = transport.get_url(end_point)
   transport.post_request(url, {}, "get") || []
 end
 
@@ -62,9 +71,21 @@ def protection_domains(scaleio_system)
   transport.post_request(url, {}, "get") || []
 end
 
+def scaleio_protection_domain_statistics(protection_domain)
+  end_point = "/api/instances/ProtectionDomain::%s/relationships/Statistics" % [protection_domain["id"]]
+  url = transport.get_url(end_point)
+  transport.post_request(url, {}, "get") || []
+end
+
 def storage_pools(scaleio_system, protection_domain)
   sp_url = "/api/types/StoragePool/instances?systemId=%s&protectiondomainId=%s" % [scaleio_system["id"], protection_domain["id"]]
   url = transport.get_url(sp_url)
+  transport.post_request(url, {}, "get") || []
+end
+
+def scaleio_storage_pool_statistics(storage_pool)
+  end_point = "/api/instances/StoragePool::%s/relationships/Statistics" % [storage_pool["id"]]
+  url = transport.get_url(end_point)
   transport.post_request(url, {}, "get") || []
 end
 
