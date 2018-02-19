@@ -7,6 +7,7 @@ class scaleio::gateway_server (
   $port     = 4443,       # int - Port for gateway
   $im_port  = 8081,       # int - Port for IM
   $pkg_ftp  = undef,      # string - URL where packages are placed (for example: ftp://ftp.emc.com/Ubuntu/2.0.10000.2072)
+  $pkg_path = undef,      # string - location of ScaleIO RPMs on local filesystem
   )
 {
   $provider = "${::osfamily}${::operatingsystemmajrelease}" ? {
@@ -30,7 +31,8 @@ class scaleio::gateway_server (
     } ->
     scaleio::package { 'gateway':
       ensure  => installed,
-      pkg_ftp => $pkg_ftp
+      pkg_ftp => $pkg_ftp,
+      pkg_path => $pkg_path
     } ->
     service { 'scaleio-gateway':
       ensure   => 'running',
@@ -69,9 +71,9 @@ class scaleio::gateway_server (
     }
     if $password {
       $jar_path = '/opt/emc/scaleio/gateway/webapps/ROOT'
-      $opts = "--reset_password '${password}' --config_file ${jar_path}/WEB-INF/classes/gatewayUser.properties"
+      $opts = "--reset_password --password '${password}' --config_file ${jar_path}/WEB-INF/classes/gatewayUser.properties"
       exec { 'Set gateway admin password':
-        command     => "java -jar ${jar_path}/resources/install-CLI.jar ${opts}",
+        command     => "java -jar ${jar_path}/resources/SioGWTool.jar ${opts}",
         path        => '/etc/alternatives',
         refreshonly => true,
         notify      => Service['scaleio-gateway']
